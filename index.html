@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0b">
+<title>Truth Labs — A one-person AI research lab</title>
+<meta name="description" content="Training, inference, GPU experiments, and consulting — one person, run in the open. Truth through compute.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0a0b'/><text x='50' y='72' font-size='60' font-family='Georgia,serif' fill='%23e3b341' text-anchor='middle'>T</text></svg>">
+<style>
+/* ============================================================
+   Truth Labs — a one-person AI research lab
+   Dark, minimal, typographic. Truth over hype.
+   Single-file static site. No build step.
+   ============================================================ */
+:root {
+  --bg: #0a0a0b;
+  --bg-soft: #0f0f12;
+  --card: #121215;
+  --card-hover: #16161a;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --text: #ece9e1;
+  --muted: #8b887e;
+  --faint: #5c5a52;
+  --accent: #e3b341;
+  --accent-ink: #1a1406;
+  --accent-soft: rgba(227, 179, 65, 0.1);
+  --good: #7bc48a;
+  --warn: #d9a03d;
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius: 14px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16.5px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: var(--accent); color: var(--accent-ink); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+
+/* Header */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10, 10, 11, 0.82);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+.wordmark { display: inline-flex; align-items: baseline; gap: 10px; color: var(--text); }
+.wordmark:hover { text-decoration: none; }
+.wordmark-lamp { color: var(--accent); font-size: 21px; }
+.wordmark-text { font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+.site-nav { display: flex; align-items: center; gap: 6px; }
+.site-nav a { color: var(--muted); font-size: 14.5px; font-weight: 500; padding: 8px 13px; border-radius: 8px; transition: color .15s ease, background .15s ease; }
+.site-nav a:hover { color: var(--text); text-decoration: none; background: rgba(255,255,255,.05); }
+.site-nav a.nav-cta { color: var(--accent-ink); background: var(--accent); font-weight: 600; margin-left: 10px; }
+.site-nav a.nav-cta:hover { background: #f0c65c; }
+
+/* Hero */
+.hero { padding: 110px 0 70px; position: relative; overflow: hidden; }
+.hero::before { content: ""; position: absolute; top: -220px; right: -160px; width: 560px; height: 560px; background: radial-gradient(circle, rgba(227,179,65,.07), transparent 65%); pointer-events: none; }
+.hero-label { display: inline-flex; align-items: center; gap: 9px; font-family: var(--mono); font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--line-strong); border-radius: 999px; padding: 7px 15px; margin-bottom: 34px; }
+.hero-label .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2.4s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.hero h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(40px, 6vw, 72px); line-height: 1.06; letter-spacing: -0.02em; max-width: 20ch; }
+.hero h1 em { font-style: italic; }
+.hero h1 .accent { color: var(--accent); font-style: normal; }
+.hero .lede { margin-top: 28px; max-width: 62ch; font-size: 19px; color: var(--muted); font-weight: 300; }
+.hero .lede strong { color: var(--text); font-weight: 500; }
+.hero-actions { margin-top: 40px; display: flex; gap: 14px; flex-wrap: wrap; }
+.btn { display: inline-block; font-size: 15px; font-weight: 600; border-radius: 10px; padding: 13px 24px; transition: transform .12s ease, background .15s ease, color .15s ease; }
+.btn:hover { text-decoration: none; transform: translateY(-1px); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { background: #f0c65c; }
+.btn-ghost { border: 1px solid var(--line-strong); color: var(--text); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Stats */
+.stats { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg-soft); }
+.stats-inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); }
+.stat { padding: 34px 28px; background: var(--bg-soft); }
+.stat .num { font-family: var(--serif); font-size: 38px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.1; }
+.stat .num .unit { font-size: 20px; color: var(--accent); font-family: var(--sans); font-weight: 500; }
+.stat .cap { margin-top: 8px; font-size: 13.5px; color: var(--muted); line-height: 1.45; }
+
+/* Sections */
+.section { padding: 96px 0; }
+.section.alt { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.sec-head { margin-bottom: 46px; }
+.sec-kicker { font-family: var(--mono); font-size: 12.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+.sec-title { font-family: var(--serif); font-size: clamp(30px, 4vw, 44px); font-weight: 500; letter-spacing: -0.015em; line-height: 1.12; max-width: 24ch; }
+.sec-sub { margin-top: 16px; max-width: 68ch; color: var(--muted); font-weight: 300; font-size: 17px; }
+
+/* Pillar cards */
+.pillar-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.pillar { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius); padding: 32px 30px; transition: border-color .15s ease, background .15s ease, transform .15s ease; }
+.pillar:hover { border-color: var(--line-strong); background: var(--card-hover); transform: translateY(-2px); }
+.pillar .scheme { color: var(--accent); font-size: 26px; line-height: 1; }
+.pillar h3 { font-family: var(--serif); font-size: 24px; font-weight: 600; margin-top: 16px; letter-spacing: -0.01em; }
+.pillar p { margin-top: 10px; color: var(--muted); font-size: 15px; font-weight: 300; }
+.pillar ul { margin: 16px 0 0; list-style: none; }
+.pillar ul li { position: relative; padding-left: 20px; font-size: 14px; color: var(--muted); margin-top: 7px; }
+.pillar ul li::before { content: "—"; position: absolute; left: 0; color: var(--accent); }
+
+/* Experiment cards */
+.exp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.exp { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius); padding: 26px 26px 24px; display: flex; flex-direction: column; transition: border-color .15s ease, background .15s ease, transform .15s ease; }
+.exp:hover { border-color: var(--line-strong); background: var(--card-hover); transform: translateY(-2px); }
+.exp .badge { align-self: flex-start; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--muted); margin-bottom: 16px; }
+.exp .badge.done { color: var(--good); border-color: rgba(123,196,138,.35); background: rgba(123,196,138,.07); }
+.exp .badge.live { color: var(--accent); border-color: rgba(227,179,65,.4); background: var(--accent-soft); }
+.exp .badge.learning { color: var(--warn); border-color: rgba(217,160,61,.4); background: rgba(217,160,61,.07); }
+.exp h3 { font-family: var(--serif); font-size: 21.5px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
+.exp h3 .link-arrow { color: var(--accent); opacity: 0; transition: opacity .15s ease; }
+.exp:hover h3 .link-arrow { opacity: 1; }
+.exp p { margin-top: 10px; font-size: 14.5px; color: var(--muted); font-weight: 300; flex-grow: 1; }
+.exp .meta { margin-top: 18px; font-family: var(--mono); font-size: 12px; color: var(--faint); border-top: 1px solid var(--line); padding-top: 14px; }
+.exp a { color: var(--text); }
+.exp a:hover { text-decoration: none; color: var(--accent); }
+
+/* Manifesto */
+.manifesto { border-left: 2px solid var(--accent); padding: 6px 0 6px 30px; max-width: 72ch; }
+.manifesto blockquote { font-family: var(--serif); font-size: clamp(22px, 3vw, 30px); font-style: italic; line-height: 1.4; }
+.manifesto blockquote .hl { color: var(--accent); font-style: normal; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+table.lab { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 720px; }
+table.lab th { font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--line); background: var(--bg-soft); white-space: nowrap; }
+table.lab td { padding: 13px 18px; border-bottom: 1px solid var(--line); color: var(--text); font-weight: 300; }
+table.lab tr:last-child td { border-bottom: none; }
+table.lab tbody tr:hover td { background: rgba(255,255,255,.02); }
+.status { font-family: var(--mono); font-size: 12px; }
+.status.done { color: var(--good); }
+.status.learning { color: var(--warn); }
+.status.live { color: var(--accent); }
+
+/* Sub-blocks */
+.blk { margin-top: 44px; }
+.blk h3 { font-family: var(--serif); font-size: 25px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 12px; }
+.blk p { max-width: 74ch; color: var(--muted); font-weight: 300; margin-top: 12px; }
+.blk p strong { color: var(--text); font-weight: 500; }
+.blk code { font-family: var(--mono); font-size: 13px; color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 5px; }
+.blk ul { margin: 14px 0 0; list-style: none; max-width: 74ch; }
+.blk ul li { position: relative; padding-left: 20px; color: var(--muted); font-weight: 300; margin-top: 8px; }
+.blk ul li::before { content: "—"; position: absolute; left: 0; color: var(--accent); }
+.spec-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 40px; margin-top: 22px; }
+.spec-list .item { border: 1px solid var(--line); background: var(--card); border-radius: 12px; padding: 18px 20px; }
+.spec-list .item .k { font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
+.spec-list .item .v { margin-top: 6px; font-size: 15px; color: var(--text); font-weight: 400; }
+
+/* Timeline */
+.timeline { margin-top: 30px; border-left: 1px solid var(--line-strong); padding-left: 28px; }
+.tl-item { position: relative; padding: 0 0 38px; }
+.tl-item::before { content: ""; position: absolute; left: -34px; top: 6px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); }
+.tl-item .yr { font-family: var(--mono); font-size: 12.5px; color: var(--accent); letter-spacing: .05em; }
+.tl-item h3 { font-family: var(--serif); font-size: 21px; font-weight: 600; margin-top: 6px; letter-spacing: -0.01em; }
+.tl-item p { margin-top: 8px; color: var(--muted); font-weight: 300; font-size: 15px; max-width: 72ch; }
+
+/* Contact */
+.contact-list { list-style: none; margin-top: 10px; }
+.contact-list li { display: flex; align-items: baseline; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.contact-list .k { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); min-width: 90px; }
+.contact-list a { font-size: 17px; color: var(--text); }
+.contact-list a:hover { color: var(--accent); }
+
+/* Footer */
+.site-footer { border-top: 1px solid var(--line); background: var(--bg-soft); }
+.footer-inner { padding: 52px 28px 40px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 30px; }
+.footer-wordmark { font-family: var(--serif); font-size: 19px; font-weight: 600; }
+.footer-tagline { margin-top: 8px; color: var(--muted); font-size: 14px; font-weight: 300; max-width: 46ch; }
+.footer-links { display: flex; flex-direction: column; gap: 9px; align-items: flex-start; }
+.footer-links a { color: var(--muted); font-size: 14.5px; }
+.footer-links a:hover { color: var(--accent); }
+.footer-meta { grid-column: 1 / -1; margin-top: 10px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--faint); font-family: var(--mono); font-size: 12px; }
+
+@media (max-width: 900px) {
+  .stats-inner { grid-template-columns: repeat(2, 1fr); }
+  .pillar-grid, .spec-list { grid-template-columns: 1fr; }
+  .exp-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  body { font-size: 15.5px; }
+  .header-inner { height: 60px; }
+  .site-nav a { padding: 6px 9px; font-size: 13px; }
+  .site-nav a.nav-cta { margin-left: 4px; }
+  .hero { padding: 70px 0 50px; }
+  .exp-grid { grid-template-columns: 1fr; }
+  .stat { padding: 24px 18px; }
+  .stat .num { font-size: 30px; }
+  .section { padding: 68px 0; }
+}
+/* Theme: light */
+html[data-theme="light"] {
+  --bg: #faf8f4;
+  --bg-soft: #f2efe8;
+  --card: #ffffff;
+  --card-hover: #fbf8f2;
+  --line: rgba(25, 22, 12, 0.10);
+  --line-strong: rgba(25, 22, 12, 0.20);
+  --text: #1d1a14;
+  --muted: #615c4f;
+  --faint: #9d968a;
+  --accent: #a67c10;
+  --accent-ink: #fffdf7;
+  --accent-soft: rgba(166, 124, 16, 0.09);
+  --good: #2e7d46;
+  --warn: #9a6a10;
+  --header-bg: rgba(250, 248, 244, 0.85);
+}
+:root { --header-bg: rgba(10, 10, 11, 0.82); }
+.site-header { background: var(--header-bg); }
+
+/* Toggles: language + theme */
+.header-tools { display: flex; align-items: center; gap: 8px; margin-left: 12px; }
+.lang-switch { display: flex; border: 1px solid var(--line-strong); border-radius: 999px; overflow: hidden; background: var(--bg-soft); }
+.lang-btn { appearance: none; -webkit-appearance: none; background: transparent; border: none; color: var(--muted); font-family: var(--sans); font-size: 12.5px; font-weight: 600; padding: 6px 12px; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.lang-btn.active { background: var(--accent); color: var(--accent-ink); }
+.lang-btn:hover { color: var(--text); }
+.lang-btn.active:hover { color: var(--accent-ink); }
+.theme-btn { appearance: none; -webkit-appearance: none; width: 34px; height: 34px; border-radius: 999px; border: 1px solid var(--line-strong); background: transparent; color: var(--muted); font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: color .15s ease, border-color .15s ease; }
+.theme-btn:hover { color: var(--accent); border-color: var(--accent); }
+.theme-btn .sun { display: none; }
+html[data-theme="light"] .theme-btn .sun { display: inline; }
+html[data-theme="light"] .theme-btn .moon { display: none; }
+
+/* i18n visibility — driven by html[data-lang], set before paint to avoid flash */
+#i18n-zh { display: none; }
+html[data-lang="zh"] #i18n-en { display: none; }
+html[data-lang="zh"] #i18n-zh { display: block; }
+#nav-zh { display: none; }
+html[data-lang="zh"] #nav-zh { display: flex; }
+html[data-lang="zh"] #nav-en { display: none; }
+#footer-zh { display: none; }
+html[data-lang="zh"] #footer-zh { display: grid; }
+html[data-lang="zh"] #footer-en { display: none; }
+[data-anchor] { scroll-margin-top: 78px; }
+
+@media (max-width: 620px) {
+  .wordmark-text { display: none; }
+  .lang-btn { padding: 5px 9px; font-size: 12px; }
+  .theme-btn { width: 30px; height: 30px; }
+  .header-tools { gap: 6px; margin-left: 6px; }
+}
+</style>
+<script>
+/* Set theme & language before first paint to avoid flash */
+(function () {
+  try {
+    var t = localStorage.getItem('tl-theme');
+    if (!t) t = (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+    var l = localStorage.getItem('tl-lang');
+    if (!l) l = (navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en';
+    document.documentElement.dataset.lang = l;
+    document.documentElement.setAttribute('lang', l === 'zh' ? 'zh-CN' : 'en');
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="#top"><span class="wordmark-lamp">⟡</span><span class="wordmark-text">Truth&nbsp;Labs</span></a>
+    <nav class="site-nav" id="nav-en" aria-label="Primary (English)" lang="en">
+      <a href="#research">Research</a>
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#contact" class="nav-cta">Work with me</a>
+    </nav>
+    <nav class="site-nav" id="nav-zh" aria-label="主导航（中文）" lang="zh-CN">
+      <a href="#research">研究</a>
+      <a href="#services">服务</a>
+      <a href="#about">关于</a>
+      <a href="#contact" class="nav-cta">联系我</a>
+    </nav>
+    <div class="header-tools">
+      <div class="lang-switch" role="group" aria-label="Language / 语言">
+        <button type="button" class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" class="lang-btn" data-lang="zh" aria-pressed="false">中文</button>
+      </div>
+      <button type="button" id="theme-btn" class="theme-btn" aria-label="Toggle theme" title="Switch theme">
+        <span class="moon">☾</span><span class="sun">☀</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <div id="i18n-en" class="i18n" lang="en">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-label"><span class="dot"></span> A one-person AI research lab</span>
+      <h1>Truth through compute — <em>nothing</em> but <span class="accent">truth</span>.</h1>
+      <p class="lede">
+        Truth Labs is a small AI research lab run by one person: <strong>Zhiwei Li</strong>.
+        We pretrain small LLMs from scratch, serve open models, build cheap GPU workstations,
+        and consult on applied AI for real engineering teams. Every experiment is run at real
+        scale and reported honestly — including the failures.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#research">Read the experiments</a>
+        <a class="btn btn-ghost" href="#services">What I offer</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section class="stats">
+    <div class="container stats-inner">
+      <div class="stat">
+        <div class="num">52<span class="unit"> GB</span></div>
+        <div class="cap">of CUDA VRAM across three home-built GPU workstations + an RTX 4070</div>
+      </div>
+      <div class="stat">
+        <div class="num">13<span class="unit">×</span></div>
+        <div class="cap">small LLMs trained from scratch on GPU and cloud hardware</div>
+      </div>
+      <div class="stat">
+        <div class="num">10<span class="unit">B</span></div>
+        <div class="cap">tokens consumed in the past year across OpenRouter, DeepSeek, Claude, MIMO</div>
+      </div>
+      <div class="stat">
+        <div class="num">12<span class="unit"> yrs</span></div>
+        <div class="cap">of engineering — 9 in corporate roles, 3 freelance, 6 full-stack</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOCUS AREAS ============ -->
+  <section class="section" data-anchor="focus">
+    <div class="container">
+      <div class="sec-head">
+        <p class="sec-kicker">Lab focus areas</p>
+        <h2 class="sec-title">Four things this lab actually does</h2>
+      </div>
+      <div class="pillar-grid">
+        <div class="pillar">
+          <div class="scheme">▰</div>
+          <h3>Training</h3>
+          <p>Pretraining small GPT-2s from scratch on real datasets — FineWeb, OpenWebText, SEC filings. Fine-tuning, LoRA, SFT, and dataset pipelines.</p>
+          <ul>
+            <li>GPT-2 124M &amp; 760M from zero, not from a checkpoint</li>
+            <li>FineWeb shards, token budgeting, training-run surgery</li>
+            <li>Scaling configs for 12 GB → 192 GB of VRAM</li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <div class="scheme">▰</div>
+          <h3>Inference &amp; serving</h3>
+          <p>Serving open models with vLLM, SGLang, and llama.cpp. Quantization, KV-cache tricks, batching, and honest benchmark numbers.</p>
+          <ul>
+            <li>nano-vLLM: Qwen3-0.6B, 506 tok/s prefill on a 4070</li>
+            <li>SGLang compiled from source, OpenAI-compatible API</li>
+            <li>DeepSeek-R1-14B Q5 GGUF on the home cluster</li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <div class="scheme">▰</div>
+          <h3>GPU &amp; hardware</h3>
+          <p>Building serious compute from second-hand parts. Fixing BIOSes, flashing cards, measuring thermals, and negotiating electricity bills.</p>
+          <ul>
+            <li>3× datacenter workstations — M40 12 / 24 GB, P100 16 GB</li>
+            <li>GPU teardowns: VRM circuitry, PCB architecture, Fermi onward</li>
+            <li>GPU clouds: RunPod H200, DigitalOcean, AMD Dev Cloud MI300X</li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <div class="scheme">▰</div>
+          <h3>Consulting</h3>
+          <p>Applied AI inside real enterprises — agent automation, LLM integration, AI-assisted engineering at banking scale.</p>
+          <ul>
+            <li>20 custom AI agents, 400 reusable scripts, 1,800 guides at HSBC</li>
+            <li>Ranked top 6% in enterprise coding-assistant usage</li>
+            <li>Cost realism: what GPUs, tokens, and agents actually cost</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPERIMENTS ============ -->
+  <section class="section alt" data-anchor="experiments">
+    <div class="container">
+      <div class="sec-head">
+        <p class="sec-kicker">Selected experiments</p>
+        <h2 class="sec-title">Work you can inspect, not just read about</h2>
+        <p class="sec-sub">Everything below is public — code on GitHub, models on Hugging Face, numbers in the training logs.</p>
+      </div>
+      <div class="exp-grid">
+        <div class="exp">
+          <span class="badge live">Completed</span>
+          <h3><a href="https://github.com/lzwjava/sec-edgar-gpt" target="_blank" rel="noopener">SEC-EDGAR-GPT<span class="link-arrow"> ↗</span></a></h3>
+          <p>A GPT-2 (124M) trained from scratch on 1.55B tokens of SEC filings in ~8 hours on a single RTX 4070. Converged at val loss 2.28, deployed as a chatbot, 200+ views inside a global bank.</p>
+          <p class="meta">1.55B tokens · 8h · RTX 4070 · 3 days end-to-end</p>
+        </div>
+        <div class="exp">
+          <span class="badge live">Completed</span>
+          <h3><a href="https://github.com/lzwjava/nanoGPT" target="_blank" rel="noopener">nanoGPT fork — 45 commits<span class="link-arrow"> ↗</span></a></h3>
+          <p>Karpathy's nanoGPT extended with FineWeb-Edu / OpenWebText / Wikipedia dataset pipelines, six training configs by GPU budget, and inline tensor-shape annotations throughout the forward pass.</p>
+          <p class="meta">45 commits · Nov 2025 – Apr 2026 · PyTorch</p>
+        </div>
+        <div class="exp">
+          <span class="badge done">Hardware</span>
+          <h3>52 GB home AI cluster</h3>
+          <p>Three second-hand datacenter workstations — Tesla M40 12 GB, M40 24 GB, P100 16 GB — coaxed into life via BIOS archaeology for ~100 CNY per GB of VRAM.</p>
+          <p class="meta">3 nodes · Maxwell + Pascal · ~$140 / 12 GB</p>
+        </div>
+        <div class="exp">
+          <span class="badge learning">Learning</span>
+          <h3>MoE &amp; serving systems</h3>
+          <p>Reading Mixture-of-Experts end-to-end: DeepSeek-MoE, MegaBlocks, Tutel. Tracing router → FusedMoe → Triton grouped-GEMM, plus paged KV cache, chunked prefill, and CUDA graphs.</p>
+          <p class="meta">nano-vLLM · SGLang from source · Qwen3-0.6B</p>
+        </div>
+        <div class="exp">
+          <span class="badge live">Completed</span>
+          <h3><a href="https://github.com/lzwjava/zz" target="_blank" rel="noopener">zz — dataset utilities<span class="link-arrow"> ↗</span></a></h3>
+          <p>Resumable FineWeb downloads, memory-safe parquet extraction, tokenization, training-duration math, and log analysis — the plumbing used by every training run above.</p>
+          <p class="meta">pyarrow · tiktoken · hf-mirror for China</p>
+        </div>
+        <div class="exp">
+          <span class="badge live">Award</span>
+          <h3><a href="https://github.com/lzwjava/flux-reel" target="_blank" rel="noopener">FluxReel — AMD hackathon<span class="link-arrow"> ↗</span></a></h3>
+          <p>One-line topic → 15-second vertical video, image generation on an AMD Radeon under ROCm. AMD AI DevMaster Hackathon Completion Award, 2026-07.</p>
+          <p class="meta">FLUX.1-schnell · diffusers · ROCm · ffmpeg</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MANIFESTO ============ -->
+  <section class="section" data-anchor="manifesto">
+    <div class="container">
+      <div class="manifesto">
+        <blockquote>
+          "I'm not a lab with a hundred researchers. I'm one engineer who trains models,
+          breaks GPUs, reads kernels — and writes down <span class="hl">what actually happened</span>,
+          including the parts that didn't work."
+        </blockquote>
+        <p style="margin-top: 20px; color: var(--muted); font-weight: 300;">— Zhiwei Li, founder &amp; sole researcher</p>
+      </div>
+      <div class="hero-actions" style="margin-top: 36px;">
+        <a class="btn btn-primary" href="#about">The person behind the lab</a>
+        <a class="btn btn-ghost" href="#contact">Talk to me</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESEARCH / LAB NOTEBOOK ============ -->
+  <section class="section alt" data-anchor="research">
+    <div class="container">
+      <div class="sec-head">
+        <p class="sec-kicker">The lab notebook</p>
+        <h2 class="sec-title">Run experiments. Write down the truth.</h2>
+        <p class="sec-sub">Every model trained, every GPU resurrected, every inference benchmark — with the numbers that came out, not the ones we wished for.</p>
+      </div>
+
+      <!-- 01 Training -->
+      <div class="sec-head" style="margin-top: 30px;">
+        <p class="sec-kicker">01 / Training</p>
+        <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">Pretraining from scratch — small models, real datasets</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table class="lab">
+          <thead>
+            <tr><th>#</th><th>Model</th><th>Framework</th><th>Params</th><th>Hardware</th><th>Steps</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>FineWeb 125M run1</td><td>nanoGPT</td><td>124M</td><td>RTX 4070</td><td>20K</td><td class="status done">completed</td></tr>
+            <tr><td>2</td><td>FineWeb 125M run2</td><td>nanoGPT</td><td>124M</td><td>RTX 4070</td><td>6K</td><td class="status done">completed</td></tr>
+            <tr><td>3</td><td>FineWeb 125M run3</td><td>nanoGPT</td><td>124M</td><td>RTX 4070</td><td>11K</td><td class="status done">completed</td></tr>
+            <tr><td>4</td><td>OpenWebText 125M</td><td>nanoGPT</td><td>124M</td><td>RTX 4070</td><td>6K</td><td class="status done">completed</td></tr>
+            <tr><td>5</td><td>FineWeb 125M MI300X</td><td>nanoGPT</td><td>124M</td><td>MI300X</td><td>750</td><td class="status done">smoke test</td></tr>
+            <tr><td>6</td><td>FineWeb 760M</td><td>nanoGPT</td><td>760M</td><td>MI300X</td><td>76K / 445K</td><td class="status learning">stopped early</td></tr>
+            <tr><td>7</td><td>fineweb-edu-d12</td><td>nanochat</td><td>286M</td><td>RTX 4070</td><td>10K</td><td class="status done">pretrain done</td></tr>
+            <tr><td>8</td><td>rtx4070-d12-chinchilla</td><td>nanochat</td><td>286M</td><td>RTX 4070</td><td>87K</td><td class="status done">fully completed</td></tr>
+            <tr><td>9</td><td>code-sec-fineweb-d12</td><td>nanochat</td><td>286M</td><td>H200</td><td>50K</td><td class="status done">completed</td></tr>
+            <tr><td>10</td><td>code-sec-sft</td><td>nanochat</td><td>~140M</td><td>H200</td><td>8,985</td><td class="status done">completed</td></tr>
+            <tr><td>11</td><td>codeparrot-d12</td><td>nanochat</td><td>286M</td><td>RTX 4070</td><td>—</td><td class="status learning">scripts only</td></tr>
+            <tr><td>12</td><td>Notes SFT (Qwen3-4B)</td><td>trl/peft</td><td>4B</td><td>RTX 4070</td><td>—</td><td class="status learning">scripts only</td></tr>
+            <tr><td>13</td><td>SPGISpeech (Whisper)</td><td>transformers</td><td>varies</td><td>—</td><td>—</td><td class="status learning">scripts only</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="blk">
+        <h3>Hardware used for these runs</h3>
+        <div class="spec-list">
+          <div class="item"><div class="k">Home workstation</div><div class="v">NVIDIA RTX 4070 · 12 GB · 3 years</div></div>
+          <div class="item"><div class="k">Cloud · RunPod / DigitalOcean</div><div class="v">NVIDIA H200 · 141 GB HBM3e · 3 months</div></div>
+          <div class="item"><div class="k">Cloud · AMD Developer Cloud</div><div class="v">AMD MI300X · 192 GB HBM3 · 3 months</div></div>
+          <div class="item"><div class="k">Home cluster (2026)</div><div class="v">M40 12 GB + M40 24 GB + P100 16 GB = 52 GB</div></div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <h3>Featured: SEC-EDGAR-GPT</h3>
+        <p>A <strong>124M-parameter GPT-2 trained from scratch on 1.55B tokens of SEC EDGAR filings</strong> (10-K, 10-Q, and corporate disclosures) — about 8 hours on a single RTX 4070, converging to a validation loss of 2.28. The model generates convincing boilerplate: risk factors, MD&amp;A sections, business descriptions. The whole pipeline — training, paper, chatbot, and website — was built in three days with an AI coding agent, and shared inside a global bank where it received 200+ views.</p>
+        <ul>
+          <li>Code — <a href="https://github.com/lzwjava/sec-edgar-gpt" target="_blank" rel="noopener">github.com/lzwjava/sec-edgar-gpt</a></li>
+          <li>Paper — <a href="https://github.com/lzwjava/sec-edgar-gpt/raw/main/sec-edgar-gpt.pdf" target="_blank" rel="noopener">sec-edgar-gpt.pdf</a></li>
+          <li>Model — <a href="https://huggingface.co/lzwjava/sec-edgar-gpt-124m-hf" target="_blank" rel="noopener">huggingface.co/lzwjava/sec-edgar-gpt-124m-hf</a></li>
+        </ul>
+        <p>It also seeded a research direction: treating <strong>financial tokens differently from natural-language tokens</strong> to improve generation accuracy — inspired by a friend's work on recurrent transformers.</p>
+      </div>
+
+      <div class="blk">
+        <h3>The nanoGPT fork</h3>
+        <p>Forked <a href="https://github.com/karpathy/nanoGPT" target="_blank" rel="noopener">karpathy/nanoGPT</a> and extended it across <strong>45 commits</strong> (Nov 2025 – Apr 2026):</p>
+        <ul>
+          <li>Dataset pipelines: <strong>FineWeb-Edu</strong> (10B+ tokens, shard-based), <strong>OpenWebText 10k</strong> (fast iteration), <strong>Wikipedia local</strong> (plain-text dump, no HF download)</li>
+          <li>Six training configs scaled by VRAM: 124M for RTX 4070, 760M for MI300X, 1.5B for H200, plus smoke tests</li>
+          <li>Inline tensor-shape annotations through <code>CausalSelfAttention</code>, <code>MLP</code>, and <code>GPT</code> — exact shapes at every step, e.g. <code>x: (B, T, C) e.g. (1, 5, 1600)</code></li>
+        </ul>
+        <p>GitHub: <a href="https://github.com/lzwjava/nanoGPT" target="_blank" rel="noopener">lzwjava/nanoGPT</a></p>
+      </div>
+
+      <div class="blk">
+        <h3>Training rules learned the hard way</h3>
+        <ul>
+          <li>Verify code, environment, and data <em>before</em> spending GPU hours — a broken pipeline always fails in training.</li>
+          <li>Check platform timeouts and balance; make every run resumable so intermediate results survive interruptions.</li>
+          <li>Scale in orders of magnitude: millions of tokens, then billions, then trillions.</li>
+          <li>Dirty data will always surface downstream. Fix root causes, not symptoms.</li>
+        </ul>
+      </div>
+
+      <!-- 02 Inference -->
+      <div class="sec-head" style="margin-top: 84px;">
+        <p class="sec-kicker">02 / Inference &amp; serving</p>
+        <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">Serving open models — from source, with honest numbers</h2>
+      </div>
+
+      <div class="blk">
+        <h3>nano-vLLM on an RTX 4070</h3>
+        <p>Ran <strong>nano-vLLM serving Qwen3-0.6B with flash-attention</strong> on the home RTX 4070: <strong>506 tok/s prefill</strong>, decode ~4–30 tok/s, and ~1,434 tok/s on a laptop benchmark. Treated as data points, not proof of anything — but they made the serving stack concrete.</p>
+      </div>
+
+      <div class="blk">
+        <h3>SGLang compiled from source</h3>
+        <p>Built <strong>SGLang from source</strong> — <code>pip install -e "python"</code>, resolved a torch/torchaudio CUDA mismatch to 2.11.0+cu130, compiled its three PyO3 Rust extensions — and served <strong>Qwen2.5-0.5B</strong> through an OpenAI-compatible API on <code>localhost:30010</code>. Also got nano-vLLM running with prebuilt <code>flash-attn==2.8.3</code> wheels.</p>
+      </div>
+
+      <div class="blk">
+        <h3>llama.cpp on the home cluster</h3>
+        <p>Serving <strong>DeepSeek-R1-Distill-Qwen-14B (Q5_K_M GGUF)</strong> through llama.cpp on the M40/P100 fleet — with the hard-won settings (<code>--n-gpu-layers 49</code>, batch size, thread counts) that make a 2015-era GPU usable in 2026.</p>
+      </div>
+
+      <div class="blk">
+        <h3>MoE &amp; the serving stack — where the depth is</h3>
+        <p>Studied <strong>Mixture-of-Experts</strong> end-to-end — DeepSeek-MoE (fine-grained + shared experts), MegaBlocks (dropless block-sparse dispatch), Tutel (all-to-all expert parallelism), Mixtral (8×7B, top-2) — tracing the forward pass: <code>router → MoELayer → FusedMoe (top-k → block-aligned dispatch → 2 fused GEMMs → sum-reduce) → Triton grouped-GEMM</code>.</p>
+        <p>Concepts being internalized (honestly, some still shallow):</p>
+        <ul>
+          <li><strong>Paged KV cache</strong> — 256-token blocks, free lists, content-hash prefix caching, copy-on-write sharing</li>
+          <li><strong>Scheduler</strong> — chunked prefill for long prompts, decode stepping, preemption under KV pressure</li>
+          <li><strong>CUDA graphs</strong> — capturing decode batches to cut kernel-launch overhead</li>
+          <li><strong>Tensor parallelism</strong> — all_reduce for row-parallel layers, gather for the LM head</li>
+        </ul>
+        <p>The honest loop: <code>read 20% → modify 30% → break things 30% → submit 20%</code>. A few weeks in; enough to follow a MoE conversation, not yet enough to improve a serving system.</p>
+      </div>
+
+      <!-- 03 GPU -->
+      <div class="sec-head" style="margin-top: 84px;">
+        <p class="sec-kicker">03 / GPU &amp; hardware</p>
+        <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">52 GB of CUDA VRAM for the price of a phone</h2>
+      </div>
+
+      <div class="blk">
+        <h3>The cluster</h3>
+        <div class="table-wrap">
+          <table class="lab">
+            <thead><tr><th>Station</th><th>GPU</th><th>VRAM</th><th>Architecture</th><th>FP16</th><th>Build cost</th></tr></thead>
+            <tbody>
+              <tr><td>M40 12 GB</td><td>Tesla M40</td><td>12 GB GDDR5</td><td>Maxwell, 2015, CC 5.2</td><td>Weak (1/64 rate)</td><td>~1,000–1,300 CNY</td></tr>
+              <tr><td>M40 24 GB</td><td>Tesla M40 24 GB</td><td>24 GB GDDR5</td><td>Maxwell, 2015, CC 5.2</td><td>Weak (1/64 rate)</td><td>Second-hand parts</td></tr>
+              <tr><td>P100 16 GB</td><td>Tesla P100 PCIe</td><td>16 GB HBM2</td><td>Pascal, 2016, CC 6.0</td><td>Fast (~9.3 TFLOPS, 2:1)</td><td>Second-hand parts</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="blk">
+        <h3>The breakthrough that made it work</h3>
+        <p>After trial and error across Huananzhi B75, ASUS A68HM-E, and MSI B150M boards, the magic on the MSI Z170A Gaming M5 was:</p>
+        <ul>
+          <li><code>Advanced → Windows OS Configuration → Windows 10 WHQL Support = Disabled</code></li>
+          <li><strong>Above 4G Decoding = Enabled</strong> (required for the M40's 64-bit BAR)</li>
+          <li><strong>CSM = Disabled</strong> (pure UEFI for correct PCIe resource allocation)</li>
+          <li>M40 in <strong>PCI_E1</strong>, the top x16 CPU-attached slot</li>
+        </ul>
+        <p>Result: <code>nvidia-smi</code> showed the full 11,520 MiB (ECC reserves 512), a burn test hit <strong>100% utilization / 6.12 TFLOPS FP32 (~90% of peak)</strong> at 35–39°C.</p>
+        <p><strong>Impact:</strong> for ~1000–1200 CNY you get 12 GB of CUDA VRAM — enough for 7B–14B models at Q4–Q8, 27B at aggressive quants (IQ1_M ~6.3 GB), batch inference, and LoRA fine-tuning. That's ~100 CNY per GB. The M40 needs a llama.cpp build with <code>-DCMAKE_CUDA_ARCHITECTURES=52</code>; the P100 needs <code>=60</code>.</p>
+      </div>
+
+      <div class="blk">
+        <h3>GPU teardowns — learning hardware from broken cards</h3>
+        <p>Bought broken <strong>Quadro 401 / 2000 / 4000</strong> cards on the second-hand market, dismantled them, and studied the boards: VRM circuitry (MOSFETs, inductors, capacitors), memory chip layout, and how each generation's architecture (Fermi → …) differs. Every PCB is a blueprint of engineering decisions.</p>
+      </div>
+
+      <div class="blk">
+        <h3>Cloud rentals, when renting beats owning</h3>
+        <ul>
+          <li><strong>RunPod H200</strong> (141 GB HBM3e) at ~$3.44/hr — the SEC-EDGAR-GPT experiments and 1.5B-scale configs</li>
+          <li><strong>AMD Developer Cloud MI300X</strong> (192 GB HBM3) — GPT-2 760M from scratch, exploring nanochat and DeepSeek v4 MoE</li>
+          <li><strong>DigitalOcean H100</strong> — additional GPT-2 runs with the <code>zz</code> dataset toolbox</li>
+        </ul>
+        <p>Membership: NVIDIA Accelerated Computing Developer Tech Exchange, and an <strong>AMD AI DevMaster Hackathon Completion Award</strong> (FluxReel, 2026-07).</p>
+      </div>
+
+      <!-- 04 Tokens -->
+      <div class="sec-head" style="margin-top: 84px;">
+        <p class="sec-kicker">04 / Usage &amp; cost</p>
+        <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">What a heavy LLM user actually consumes</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table class="lab">
+          <thead><tr><th>Platform</th><th>Tokens</th><th>Period</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td>OpenRouter</td><td>7.28B</td><td>Past year (155K requests)</td><td>$239</td></tr>
+            <tr><td>DeepSeek</td><td>629M</td><td>Past year</td><td>—</td></tr>
+            <tr><td>SSSAICode (Claude)</td><td>115M+</td><td>April 2026 (2,555 requests, 90.9% cache hit)</td><td>$171.53</td></tr>
+            <tr><td>Xiaomi MIMO</td><td>1.25B</td><td>May–Jun 2026 (mimo-v2.5-pro, ~96.7% cache hit)</td><td>Free 4.6B credit</td></tr>
+            <tr><td>GitHub Copilot &amp; others</td><td>726M</td><td>Past year</td><td>—</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>10B</strong></td><td>Past year</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="blk">
+        <h3>What the numbers taught me</h3>
+        <ul>
+          <li>Cache hit rates are the single biggest cost lever — 90%+ cache hits collapse API bills.</li>
+          <li>One heavy production model (mimo-v2.5-pro) carried ~96% of usage — focus single workflows, not ten toys.</li>
+          <li>Rented H200s at $3.44/hr shape how you schedule experiments; 52 GB of owned VRAM shapes everything else.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section class="section" data-anchor="services">
+    <div class="container">
+      <div class="sec-head">
+        <p class="sec-kicker">Services</p>
+        <h2 class="sec-title">What the lab can do for you</h2>
+        <p class="sec-sub">A one-person lab keeps its promises small and its evidence large. Four service lines, each backed by work that is already public and verifiable.</p>
+      </div>
+      <div class="pillar-grid">
+        <div class="pillar">
+          <div class="scheme">▰</div>
+          <h3>AI inference</h3>
+          <p>Stand up and tune open-model serving for your workload — on your GPUs, or the cheapest cloud that fits.</p>
+          <ul>
+            <li>vLLM / SGLang / llama.cpp deployment with OpenAI-compatible APIs</li>
+            <li>Quantization strategy: GGUF, GPTQ, AWQ, FP8 — and what you lose</li>
+            <li>Latency/throughput benchmarking with numbers attached</li>
+            <li>KV-cache sizing, batching, and speculative-decoding sanity checks</li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <div class="scheme">▰</div>
+          <h3>GPU &amp; hardware</h3>
+          <p>Cheap, reliable GPU compute — from reclaiming second-hand datacenter cards to choosing and operating cloud instances.</p>
+          <ul>
+            <li>Cost-efficient workstation builds (the ~100 CNY/GB playbook)</li>
+            <li>GPU BIOS/UEFI bring-up, passive-cooling rigs, thermal validation</li>
+            <li>Cloud benchmark comparisons: RunPod, DigitalOcean, AMD Dev Cloud, neoclouds</li>
+            <li>Power/cost modelling, including residential-rate realities</li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <div class="scheme">▰</div>
+          <h3>Training &amp; fine-tuning</h3>
+          <p>Pretraining runs, supervised fine-tuning, and dataset pipelines designed for the hardware you actually have.</p>
+          <ul>
+            <li>Small-model pretraining from scratch (GPT-2-class, 124M–760M+)</li>
+            <li>LoRA / SFT on open models with trl + peft</li>
+            <li>Dataset work: FineWeb-style sharded pipelines, token budgeting, dedup</li>
+            <li>Training-run plumbing: resumability, logging, and honest eval</li>
+          </ul>
+        </div>
+        <div class="pillar">
+          <div class="scheme">▰</div>
+          <h3>AI consulting</h3>
+          <p>Applied AI inside real engineering organizations — agents, workflows, and LLM integration without the hype.</p>
+          <ul>
+            <li>Enterprise AI-agent programs (20 agents, 400 scripts, 1,800 docs at HSBC)</li>
+            <li>AI-assisted engineering practice: reviews, automation, adoption metrics</li>
+            <li>Cost realism: what tokens, GPUs, and agents actually cost</li>
+            <li>Technical talks &amp; workshops (80-person bank audience, first principles)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sec-head" style="margin-top: 84px;">
+        <p class="sec-kicker">Engagement</p>
+        <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">Scoped, evidence-based, open by default</h2>
+      </div>
+      <div class="blk">
+        <ul>
+          <li><strong>Scoped experiments first</strong> — a small, measurable deliverable (a benchmark, a hosted API, a trained model) before anything bigger.</li>
+          <li><strong>Evidence over slides</strong> — every engagement ends with public artifacts where possible: code, logs, numbers.</li>
+          <li><strong>Right-sized hardware</strong> — I'll tell you when a $3.44/hr H200 is the play and when a second-hand M40 is.</li>
+          <li><strong>Day rate or fixed scope</strong> — consulting engagements by day; one-shot experiments by fixed quote.</li>
+        </ul>
+      </div>
+      <div class="blk">
+        <ul>
+          <li><strong>References you can check yourself:</strong> top 6% coding-assistant usage at a British universal bank; AIPlayer Contribution Award; SEC-EDGAR-GPT (200+ internal views); 13 pretraining runs; 45-commit nanoGPT fork; ~10 maintained projects at <a href="https://github.com/lzwjava" target="_blank" rel="noopener">github.com/lzwjava</a>.</li>
+        </ul>
+      </div>
+      <div style="margin-top: 36px;">
+        <a class="btn btn-primary" href="#contact">Start a conversation</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="section alt" data-anchor="about">
+    <div class="container">
+      <div class="sec-head">
+        <p class="sec-kicker">About</p>
+        <h2 class="sec-title">One engineer, a stack of GPUs, and a stubborn need to know</h2>
+        <p class="sec-sub">
+          <strong>Zhiwei Li</strong> — full-stack engineer turned AI researcher, 12 years of professional
+          engineering, two startups, one global bank, 10 billion tokens consumed in the last year.
+          The lab is deliberately small: the truth is easier to verify when only one person is
+          responsible for it.
+        </p>
+      </div>
+
+      <p class="sec-kicker" style="margin-top: 30px;">The path</p>
+      <h3 class="blk" style="font-size: 22px; margin-top: 0;">From NOIP to nanoGPT</h3>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="yr">2008 – 2014</div>
+          <h3>First code, first contests, first apps</h3>
+          <p>Started programming in 2008. Ranked in the top 300 of Guangdong NOIP 2011 and solved ~1,000 algorithm problems online. At Beijing Forestry University (digital media arts, dropped out after a year, 13 courses passed), built a campus assistant app downloaded by thousands, and won the 2014 Blue Bridge Cup first prize.</p>
+        </div>
+        <div class="tl-item">
+          <div class="yr">2014 – 2016</div>
+          <h3>LeanCloud &amp; the SDK years</h3>
+          <p>Software engineer at LeanCloud — worked on the Objective-C and Java SDKs and built LeanChat for iOS and Android as the flagship SDK demo, plus assorted frontend work.</p>
+        </div>
+        <div class="tl-item">
+          <div class="yr">2015 – 2016</div>
+          <h3>Co-founded CodeReview.cn</h3>
+          <p>A professional code-review, communication, and workshop platform with five co-founders — ~3,000 users, backend plus half the frontend in PHP + Vue.</p>
+        </div>
+        <div class="tl-item">
+          <div class="yr">2016 – 2019</div>
+          <h3>Founded Square Root Technology</h3>
+          <p>Two businesses in 3.5 years. <strong>Fun Live</strong>, a knowledge live-broadcast platform: 80 lectures, 30,000 users, millions of page views, ~2,000 commits of my own code. Then a software consulting business: 50 projects, ~3M RMB revenue, ~700K profit, and a WeChat mini-program for Jiangsu TV's Super Brain.</p>
+        </div>
+        <div class="tl-item">
+          <div class="yr">2019 – 2021</div>
+          <h3>Freelance full-stack</h3>
+          <p>Shipping client work (ShowMeBug × Enterprise WeChat, trade-data scraping, an LED-sign company website), ~500 more algorithm problems, and a first serious pass at machine learning and cloud-native tech.</p>
+        </div>
+        <div class="tl-item">
+          <div class="yr">2021 – 2023</div>
+          <h3>On secondment — banking backend at DBS &amp; HSBC</h3>
+          <p>Equity trading microservices for DBS (Avaloq, edit-distance search), then HSBC PayMe's auto top-up and AWS migration. Deep experience in Java, Spring Cloud, banking systems, and regulated engineering.</p>
+        </div>
+        <div class="tl-item">
+          <div class="yr">2023</div>
+          <h3>The turning point: building an ML workstation</h3>
+          <p>Assembled the RTX 4070 workstation, completed the DeepLearning.AI Machine Learning and Deep Learning specializations, and analyzed/reimplemented ~30 example ML projects. Started fine-tuning and pretraining small models in earnest.</p>
+        </div>
+        <div class="tl-item">
+          <div class="yr">2025 – 2026</div>
+          <h3>AI engineering at a British universal bank</h3>
+          <p>Full-stack at HSBC via TEKsystems: 20 customized AI agents, 400 reusable assistant-written scripts, 1,800 generated guides, ~70 auto-generated test cases, ranked top 6% in enterprise coding-assistant usage, earned a Contribution Award for the AIPlayer project, and gave an 80-person technical talk, <em>"From Neural Networks to Agents"</em>.</p>
+        </div>
+        <div class="tl-item">
+          <div class="yr">2026</div>
+          <h3>Truth Labs</h3>
+          <p>Trained SEC-EDGAR-GPT, built a 52 GB second-hand GPU cluster, explored MoE and serving systems, consumed 10B tokens to learn how, and started an online MSCSE at California Science and Technology University. Everything — including the failures — is written down at lzwjava.com.</p>
+        </div>
+      </div>
+
+      <div class="sec-head" style="margin-top: 60px;">
+        <p class="sec-kicker">Profile</p>
+        <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">Quick facts</h2>
+      </div>
+      <div class="spec-list">
+        <div class="item"><div class="k">Location</div><div class="v">Guangzhou, China</div></div>
+        <div class="item"><div class="k">Languages</div><div class="v">Chinese (native), English (IELTS 6.5)</div></div>
+        <div class="item"><div class="k">Experience</div><div class="v">12 years total — 2 mobile, 6 full-stack, 2 ML/big data, 2 PM</div></div>
+        <div class="item"><div class="k">AI credentials</div><div class="v">13 small LLMs trained; ML + DL specializations (DeepLearning.AI); AMD AI DevMaster award</div></div>
+        <div class="item"><div class="k">Writing</div><div class="v">~400 original blog posts, ~75K page views/month, 320+ books read</div></div>
+        <div class="item"><div class="k">Studying</div><div class="v">Online MSCSE, Computer Systems &amp; Engineering (2026.10 – present)</div></div>
+      </div>
+
+      <div class="blk">
+        <h3>Papers</h3>
+        <ul>
+          <li>Li, Zhiwei. (Jun 2026). <em>SEC-EDGAR-GPT: A GPT-2 (124M) Language Model Trained from Scratch on SEC EDGAR Filings.</em> — <a href="https://github.com/lzwjava/sec-edgar-gpt/raw/main/sec-edgar-gpt.pdf" target="_blank" rel="noopener">PDF</a> · <a href="https://github.com/lzwjava/sec-edgar-gpt" target="_blank" rel="noopener">code</a></li>
+          <li>Li, Zhiwei. (Aug 2025). <em>Natural Vision Restoration: Experimental Verification, Astigmatism Reduction, and the 'Just Barely Clear' Principle.</em> — three years of self-experimentation, the same research muscle applied to biology.</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <h3>Why a "lab" of one?</h3>
+        <p>Big labs have the budget to buy certainty. A one-person lab has to <em>build</em> it — from second-hand graphics cards, from public datasets, from training runs repeated until the result is undeniable. The trade is real: no research team, no funding round, no press releases. What you get instead is a full record — <a href="https://lzwjava.com/ai-portfolio-en" target="_blank" rel="noopener">which experiments worked, which were smoke tests, and which were abandoned</a> — plus the very useful skill of doing most of a lab's work with your own hands.</p>
+      </div>
+
+      <div class="hero-actions" style="margin-top: 36px;">
+        <a class="btn btn-primary" href="#contact">Contact me</a>
+        <a class="btn btn-ghost" href="https://lzwjava.com/resume-en" target="_blank" rel="noopener">Full résumé</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section" data-anchor="contact">
+    <div class="container">
+      <div class="sec-head">
+        <p class="sec-kicker">Contact</p>
+        <h2 class="sec-title">Let's build or break something together</h2>
+        <p class="sec-sub">Hiring a one-person lab is a leap of faith — so ask for evidence. I'll happily share training logs, benchmark numbers, or any of the public work behind this site.</p>
+      </div>
+
+      <ul class="contact-list">
+        <li><span class="k">Email</span><a href="mailto:lzwjava@gmail.com">lzwjava@gmail.com</a></li>
+        <li><span class="k">GitHub</span><a href="https://github.com/lzwjava" target="_blank" rel="noopener">github.com/lzwjava</a></li>
+        <li><span class="k">Blog</span><a href="https://lzwjava.com" target="_blank" rel="noopener">lzwjava.com</a></li>
+        <li><span class="k">Portfolio</span><a href="https://lzwjava.com/ai-portfolio-en" target="_blank" rel="noopener">Evidence of daily AI work</a></li>
+        <li><span class="k">Résumé</span><a href="https://lzwjava.com/resume-en" target="_blank" rel="noopener">Full résumé &amp; PDFs</a></li>
+        <li><span class="k">LinkedIn</span><a href="https://www.linkedin.com/in/lzwjava" target="_blank" rel="noopener">in/lzwjava</a></li>
+      </ul>
+
+      <div class="blk">
+        <h3>What to send me</h3>
+        <ul>
+          <li><strong>For inference/serving</strong> — model, expected traffic, latency budget, hardware you already own.</li>
+          <li><strong>For GPU builds</strong> — budget, VRAM target, country/region (it changes the second-hand market), power constraints.</li>
+          <li><strong>For training</strong> — dataset, target model size, hardware you have access to, and your deadline (if any).</li>
+          <li><strong>For consulting</strong> — the workflow you want to automate and what would make it measurably better.</li>
+          <li><strong>For honest questions</strong> — anything. If I don't know, I'll tell you I don't know, and learn it in public.</li>
+        </ul>
+      </div>
+
+      <div class="blk">
+        <h3>Response expectations &amp; availability</h3>
+        <p>Truth Labs is run by one person with a day job and a GPU habit. I usually reply within a couple of days, and I'd rather send you a well-thought paragraph than a fast buzzword. Open for <strong>scoped experiments and consulting engagements</strong> without exclusivity — the kind where the deliverable is code, logs, and numbers.</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /i18n-en -->
+
+  <div id="i18n-zh" class="i18n" lang="zh-CN">
+
+    <!-- ============ 首页主视觉 HERO ============ -->
+    <section class="hero">
+      <div class="container">
+        <span class="hero-label"><span class="dot"></span> 一个人的 AI 研究实验室</span>
+        <h1>用算力求真 —— <em>除了真相</em>，<span class="accent">别无他物</span>。</h1>
+        <p class="lede">
+          Truth Labs 是一个由一个人运营的小型 AI 研究实验室：<strong>李智维（Zhiwei Li）</strong>。
+          我们从零预训练小型大语言模型、部署开源模型推理、组装便宜的 GPU 工作站，
+          并为真实的工程团队提供应用型 AI 咨询。每一项实验都以真实规模运行，
+          并如实记录——包括失败的部分。
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#research">查看实验</a>
+          <a class="btn btn-ghost" href="#services">我能提供什么</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 数据概览 STATS ============ -->
+    <section class="stats">
+      <div class="container stats-inner">
+        <div class="stat"><div class="num">52<span class="unit"> GB</span></div><div class="cap">遍布三台自制 GPU 工作站 + RTX 4070 的 CUDA 显存总量</div></div>
+        <div class="stat"><div class="num">13<span class="unit">×</span></div><div class="cap">在 GPU 与云硬件上从零训练的小型大语言模型</div></div>
+        <div class="stat"><div class="num">10<span class="unit">B</span></div><div class="cap">过去一年在 OpenRouter、DeepSeek、Claude、小米 MIMO 等平台消耗的 token</div></div>
+        <div class="stat"><div class="num">12<span class="unit"> 年</span></div><div class="cap">工程经验——9 年企业任职、3 年自由职业、6 年前后端开发</div></div>
+      </div>
+    </section>
+
+    <!-- ============ 实验室方向 FOCUS ============ -->
+    <section class="section" data-anchor="focus">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-kicker">实验室方向</p>
+          <h2 class="sec-title">这个实验室真正在做的四件事</h2>
+        </div>
+        <div class="pillar-grid">
+          <div class="pillar">
+            <div class="scheme">▰</div>
+            <h3>训练</h3>
+            <p>在真实数据集（FineWeb、OpenWebText、SEC 财报）上从零预训练小型 GPT-2。微调、LoRA、SFT 与数据处理管线。</p>
+            <ul>
+              <li>从零训练 GPT-2 124M 与 760M，而非加载现成权重</li>
+              <li>FineWeb 分片、token 预算、训练排错</li>
+              <li>适配 12 GB → 192 GB 显存的扩展配置</li>
+            </ul>
+          </div>
+          <div class="pillar">
+            <div class="scheme">▰</div>
+            <h3>推理与部署</h3>
+            <p>使用 vLLM、SGLang、llama.cpp 部署开源模型。量化、KV 缓存调优、批处理，以及诚实的基准数字。</p>
+            <ul>
+              <li>nano-vLLM：Qwen3-0.6B，在 4070 上 prefill 506 tok/s</li>
+              <li>从源码编译 SGLang，兼容 OpenAI API</li>
+              <li>家庭集群上运行 DeepSeek-R1-14B Q5 GGUF</li>
+            </ul>
+          </div>
+          <div class="pillar">
+            <div class="scheme">▰</div>
+            <h3>GPU 与硬件</h3>
+            <p>用二手部件组装高性能算力。修 BIOS、刷显卡、测散热、算电费。</p>
+            <ul>
+              <li>3 台数据中心级工作站——M40 12 / 24 GB、P100 16 GB</li>
+              <li>GPU 拆解：VRM 电路、PCB 结构、从 Fermi 起的各代架构</li>
+              <li>GPU 云：RunPod H200、DigitalOcean、AMD Dev Cloud MI300X</li>
+            </ul>
+          </div>
+          <div class="pillar">
+            <div class="scheme">▰</div>
+            <h3>咨询</h3>
+            <p>在企业内落地 AI——智能体自动化、LLM 集成、银行级别的 AI 辅助工程实践。</p>
+            <ul>
+              <li>在 HSBC 交付 20 个定制 AI 智能体、400 个可复用脚本、1800 AI回答笔记</li>
+              <li>企业级编程助手使用量进入前 6%</li>
+              <li>成本务实：GPU、token 与智能体的真实开销</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 精选实验 EXPERIMENTS ============ -->
+    <section class="section alt" data-anchor="experiments">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-kicker">精选实验</p>
+          <h2 class="sec-title">可以亲手检验的工作，而非只能读到的宣传</h2>
+          <p class="sec-sub">以下所有内容都是公开的——GitHub 上的代码、Hugging Face 上的模型、训练日志里的数字。</p>
+        </div>
+        <div class="exp-grid">
+          <div class="exp">
+            <span class="badge live">已完成</span>
+            <h3><a href="https://github.com/lzwjava/sec-edgar-gpt" target="_blank" rel="noopener">SEC-EDGAR-GPT<span class="link-arrow"> ↗</span></a></h3>
+            <p>在一张 RTX 4070 上用约 8 小时、从零训练 1.55B 个 SEC 财报 token 的 GPT-2（124M）。验证损失收敛至 2.28，部署为聊天机器人，在全球银行内部获得 200+ 浏览。</p>
+            <p class="meta">1.55B tokens · 8 小时 · RTX 4070 · 3 天全流程</p>
+          </div>
+          <div class="exp">
+            <span class="badge live">已完成</span>
+            <h3><a href="https://github.com/lzwjava/nanoGPT" target="_blank" rel="noopener">nanoGPT 分支——45 次提交<span class="link-arrow"> ↗</span></a></h3>
+            <p>在 Karpathy 的 nanoGPT 上扩展出 FineWeb-Edu / OpenWebText / Wikipedia 数据处理管线、6 套按显存预算设计的训练配置，并在前向传播中加入逐行张量形状注释。</p>
+            <p class="meta">45 次提交 · 2025.11 – 2026.04 · PyTorch</p>
+          </div>
+          <div class="exp">
+            <span class="badge done">硬件</span>
+            <h3>52 GB 家庭 AI 集群</h3>
+            <p>三台二手数据中心工作站——Tesla M40 12 GB、M40 24 GB、P100 16 GB——通过 BIOS 考古式调试复活，每 GB 显存约 100 元人民币。</p>
+            <p class="meta">3 节点 · Maxwell + Pascal · 12 GB 约 $140</p>
+          </div>
+          <div class="exp">
+            <span class="badge learning">学习中</span>
+            <h3>MoE 与推理系统</h3>
+            <p>端到端研读混合专家（MoE）：DeepSeek-MoE、MegaBlocks、Tutel。追踪 router → FusedMoe → Triton grouped-GEMM，以及分页 KV 缓存、分块 prefill、CUDA graphs。</p>
+            <p class="meta">nano-vLLM · 从源码编译 SGLang · Qwen3-0.6B</p>
+          </div>
+          <div class="exp">
+            <span class="badge live">已完成</span>
+            <h3><a href="https://github.com/lzwjava/zz" target="_blank" rel="noopener">zz——数据处理工具箱<span class="link-arrow"> ↗</span></a></h3>
+            <p>可断点续传的 FineWeb 下载、内存安全的 parquet 提取、分词、训练时长估算与日志分析——上面每一次训练运行的底层工具。</p>
+            <p class="meta">pyarrow · tiktoken · 支持 hf-mirror 国内镜像</p>
+          </div>
+          <div class="exp">
+            <span class="badge live">获奖</span>
+            <h3><a href="https://github.com/lzwjava/flux-reel" target="_blank" rel="noopener">FluxReel——AMD 黑客松<span class="link-arrow"> ↗</span></a></h3>
+            <p>一行主题 → 15 秒竖屏短视频，图像生成运行在 AMD Radeon（ROCm）上。获得 AMD AI DevMaster 黑客松完赛奖（2026-07）。</p>
+            <p class="meta">FLUX.1-schnell · diffusers · ROCm · ffmpeg</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 宣言 MANIFESTO ============ -->
+    <section class="section" data-anchor="manifesto">
+      <div class="container">
+        <div class="manifesto">
+          <blockquote>
+            “我不是拥有一百名研究员的大型实验室。我只是一个会训练模型、会拆坏 GPU、会读 kernel 的工程师——
+            并且会把<span class="hl">实际发生了什么</span>写下来，包括那些没有成功的部分。”
+          </blockquote>
+          <p style="margin-top: 20px; color: var(--muted); font-weight: 300;">—— 李智维（Zhiwei Li），创始人兼唯一研究员</p>
+        </div>
+        <div class="hero-actions" style="margin-top: 36px;">
+          <a class="btn btn-primary" href="#about">实验室背后的这个人</a>
+          <a class="btn btn-ghost" href="#contact">联系我</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 研究 / 实验室笔记 RESEARCH ============ -->
+    <section class="section alt" data-anchor="research">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-kicker">实验室笔记</p>
+          <h2 class="sec-title">做实验。把真相写下来。</h2>
+          <p class="sec-sub">每一条训练记录、每一块被救活的 GPU、每一个推理基准——记录的都是一手测出来的数字，而不是我们希望看到的数据。</p>
+        </div>
+
+        <!-- 01 训练 -->
+        <div class="sec-head" style="margin-top: 30px;">
+          <p class="sec-kicker">01 / 训练</p>
+          <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">从零预训练——小模型、真实数据集</h2>
+        </div>
+
+        <div class="table-wrap">
+          <table class="lab">
+            <thead>
+              <tr><th>#</th><th>模型</th><th>框架</th><th>参数量</th><th>硬件</th><th>步数</th><th>状态</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>FineWeb 125M run1</td><td>nanoGPT</td><td>124M</td><td>RTX 4070</td><td>20K</td><td class="status done">已完成</td></tr>
+              <tr><td>2</td><td>FineWeb 125M run2</td><td>nanoGPT</td><td>124M</td><td>RTX 4070</td><td>6K</td><td class="status done">已完成</td></tr>
+              <tr><td>3</td><td>FineWeb 125M run3</td><td>nanoGPT</td><td>124M</td><td>RTX 4070</td><td>11K</td><td class="status done">已完成</td></tr>
+              <tr><td>4</td><td>OpenWebText 125M</td><td>nanoGPT</td><td>124M</td><td>RTX 4070</td><td>6K</td><td class="status done">已完成</td></tr>
+              <tr><td>5</td><td>FineWeb 125M MI300X</td><td>nanoGPT</td><td>124M</td><td>MI300X</td><td>750</td><td class="status done">冒烟测试</td></tr>
+              <tr><td>6</td><td>FineWeb 760M</td><td>nanoGPT</td><td>760M</td><td>MI300X</td><td>76K / 445K</td><td class="status learning">提前停止</td></tr>
+              <tr><td>7</td><td>fineweb-edu-d12</td><td>nanochat</td><td>286M</td><td>RTX 4070</td><td>10K</td><td class="status done">预训练完成</td></tr>
+              <tr><td>8</td><td>rtx4070-d12-chinchilla</td><td>nanochat</td><td>286M</td><td>RTX 4070</td><td>87K</td><td class="status done">全部完成</td></tr>
+              <tr><td>9</td><td>code-sec-fineweb-d12</td><td>nanochat</td><td>286M</td><td>H200</td><td>50K</td><td class="status done">已完成</td></tr>
+              <tr><td>10</td><td>code-sec-sft</td><td>nanochat</td><td>~140M</td><td>H200</td><td>8,985</td><td class="status done">已完成</td></tr>
+              <tr><td>11</td><td>codeparrot-d12</td><td>nanochat</td><td>286M</td><td>RTX 4070</td><td>—</td><td class="status learning">仅有脚本</td></tr>
+              <tr><td>12</td><td>Notes SFT (Qwen3-4B)</td><td>trl/peft</td><td>4B</td><td>RTX 4070</td><td>—</td><td class="status learning">仅有脚本</td></tr>
+              <tr><td>13</td><td>SPGISpeech (Whisper)</td><td>transformers</td><td>varies</td><td>—</td><td>—</td><td class="status learning">仅有脚本</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="blk">
+          <h3>以上训练使用的硬件</h3>
+          <div class="spec-list">
+            <div class="item"><div class="k">家用工作站</div><div class="v">NVIDIA RTX 4070 · 12 GB · 3 年</div></div>
+            <div class="item"><div class="k">云 · RunPod / DigitalOcean</div><div class="v">NVIDIA H200 · 141 GB HBM3e · 3 个月</div></div>
+            <div class="item"><div class="k">云 · AMD Developer Cloud</div><div class="v">AMD MI300X · 192 GB HBM3 · 3 个月</div></div>
+            <div class="item"><div class="k">家庭集群（2026）</div><div class="v">M40 12 GB + M40 24 GB + P100 16 GB = 52 GB</div></div>
+          </div>
+        </div>
+
+        <div class="blk">
+          <h3>代表作：SEC-EDGAR-GPT</h3>
+          <p><strong>从零在 1.55B 个 SEC EDGAR 财报 token（10-K、10-Q 与公司披露文件）上训练的 GPT-2（124M）</strong>——在一张 RTX 4070 上约 8 小时完成，验证损失收敛至 2.28。模型能生成以假乱真的财报套话：风险因素、管理层讨论与分析（MD&amp;A）、公司业务描述。训练、论文、聊天机器人到网站，全流程用时三天，借助 AI 编程智能体完成；在全球银行内部发布后获得 200+ 浏览。</p>
+          <ul>
+            <li>代码——<a href="https://github.com/lzwjava/sec-edgar-gpt" target="_blank" rel="noopener">github.com/lzwjava/sec-edgar-gpt</a></li>
+            <li>论文——<a href="https://github.com/lzwjava/sec-edgar-gpt/raw/main/sec-edgar-gpt.pdf" target="_blank" rel="noopener">sec-edgar-gpt.pdf</a></li>
+            <li>模型——<a href="https://huggingface.co/lzwjava/sec-edgar-gpt-124m-hf" target="_blank" rel="noopener">huggingface.co/lzwjava/sec-edgar-gpt-124m-hf</a></li>
+          </ul>
+          <p>它还启发了一个研究方向：受一位朋友做循环 transformer 的启发，思考<strong>把金融 token 与自然语言 token 区别对待</strong>，以提高生成准确率。</p>
+        </div>
+
+        <div class="blk">
+          <h3>nanoGPT 分支</h3>
+          <p>Fork 了 <a href="https://github.com/karpathy/nanoGPT" target="_blank" rel="noopener">karpathy/nanoGPT</a>，并以 <strong>45 次提交</strong>（2025.11 – 2026.04）进行了扩展：</p>
+          <ul>
+            <li>数据管线：<strong>FineWeb-Edu</strong>（100 亿+ token，分片加载）、<strong>OpenWebText 10k</strong>（快速迭代）、<strong>本地 Wikipedia</strong>（纯文本 dump，无需 HF 下载）</li>
+            <li>六套按显存扩展的训练配置：124M 对应 RTX 4070、760M 对应 MI300X、1.5B 对应 H200，另有冒烟测试配置</li>
+            <li>在 <code>CausalSelfAttention</code>、<code>MLP</code>、<code>GPT</code> 中加入逐行张量形状注释——每一步的确切形状，例如 <code>x: (B, T, C) e.g. (1, 5, 1600)</code></li>
+          </ul>
+          <p>GitHub: <a href="https://github.com/lzwjava/nanoGPT" target="_blank" rel="noopener">lzwjava/nanoGPT</a></p>
+        </div>
+
+        <div class="blk">
+          <h3>用教训换来的训练守则</h3>
+          <ul>
+            <li>在投入 GPU 时间之前先验证代码、环境与数据——出问题的管线一定会在训练中暴露。</li>
+            <li>检查平台的超时时间与余额；让每一次训练都可断点续传，中途结果不丢失。</li>
+            <li>按数量级迭代：先几百万 token，再几十亿，再到万亿。</li>
+            <li>脏数据总会在下游浮现。修复根因，而不是修补表象。</li>
+          </ul>
+        </div>
+
+        <!-- 02 推理 -->
+        <div class="sec-head" style="margin-top: 84px;">
+          <p class="sec-kicker">02 / 推理与部署</p>
+          <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">部署开源模型——从源码编译，数字如实</h2>
+        </div>
+
+        <div class="blk">
+          <h3>RTX 4070 上的 nano-vLLM</h3>
+          <p>在家用 RTX 4070 上用 <strong>nano-vLLM 以 flash-attention 部署 Qwen3-0.6B</strong>：prefill <strong>506 tok/s</strong>，decode 约 4–30 tok/s，笔记本基准约 1,434 tok/s。只当作数据点，不当作任何论断——但足以让推理栈变得具体。</p>
+        </div>
+
+        <div class="blk">
+          <h3>从源码编译 SGLang</h3>
+          <p><strong>从源码构建 SGLang</strong>——<code>pip install -e "python"</code>，把 torch/torchaudio 的 CUDA 版本冲突修复到 2.11.0+cu130，编译其三个 PyO3 Rust 扩展——并在 <code>localhost:30010</code> 通过 OpenAI 兼容 API 部署 <strong>Qwen2.5-0.5B</strong>。同时也用预编译的 <code>flash-attn==2.8.3</code> wheel 跑通了 nano-vLLM。</p>
+        </div>
+
+        <div class="blk">
+          <h3>家庭集群上的 llama.cpp</h3>
+          <p>在 M40/P100 集群上用 llama.cpp 部署 <strong>DeepSeek-R1-Distill-Qwen-14B（Q5_K_M GGUF）</strong>——依靠来之不易的参数（<code>--n-gpu-layers 49</code>、批大小、线程数），让 2015 年的显卡在 2026 年依然能打。</p>
+        </div>
+
+        <div class="blk">
+          <h3>MoE 与推理栈——水最深的地方</h3>
+          <p>端到端研读<strong>混合专家（Mixture-of-Experts）</strong>——DeepSeek-MoE（细粒度 + 共享专家）、MegaBlocks（无丢弃的块稀疏派发）、Tutel（全对全专家并行）、Mixtral（8×7B，top-2）——并追踪前向传播：<code>router → MoELayer → FusedMoe（top-k → 块对齐派发 → 二次融合 GEMM → 求和归约）→ Triton grouped-GEMM</code>。</p>
+          <p>正在内化的概念（老实说，有些还很浅）：</p>
+          <ul>
+            <li><strong>分页 KV 缓存</strong>——256-token 块、空闲链表、内容哈希前缀缓存、写时复制共享</li>
+            <li><strong>调度器</strong>——长提示的分块 prefill、decode 步进、KV 满时的抢占</li>
+            <li><strong>CUDA graphs</strong>——捕获 decode 批次以降低 kernel 启动开销</li>
+            <li><strong>张量并行</strong>——行并行层做 all_reduce、LM head 做 gather</li>
+          </ul>
+          <p>诚实的循环：<code>读 20% → 改 30% → 弄坏 30% → 提交 20%</code>。才几周时间；能跟上 MoE 的讨论，但还不足以自己改进一个推理系统。</p>
+        </div>
+
+        <!-- 03 GPU -->
+        <div class="sec-head" style="margin-top: 84px;">
+          <p class="sec-kicker">03 / GPU 与硬件</p>
+          <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">用一部手机的钱买来 52 GB CUDA 显存</h2>
+        </div>
+
+        <div class="blk">
+          <h3>集群构成</h3>
+          <div class="table-wrap">
+            <table class="lab">
+              <thead><tr><th>工作站</th><th>GPU</th><th>显存</th><th>架构</th><th>FP16</th><th>装机成本</th></tr></thead>
+              <tbody>
+                <tr><td>M40 12 GB</td><td>Tesla M40</td><td>12 GB GDDR5</td><td>Maxwell, 2015, CC 5.2</td><td>弱（1/64 速率）</td><td>约 1,000–1,300 元</td></tr>
+                <tr><td>M40 24 GB</td><td>Tesla M40 24 GB</td><td>24 GB GDDR5</td><td>Maxwell, 2015, CC 5.2</td><td>弱（1/64 速率）</td><td>二手部件</td></tr>
+                <tr><td>P100 16 GB</td><td>Tesla P100 PCIe</td><td>16 GB HBM2</td><td>Pascal, 2016, CC 6.0</td><td>快（约 9.3 TFLOPS，2:1）</td><td>二手部件</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="blk">
+          <h3>让一切都跑起来的关键突破</h3>
+          <p>在 Huananzhi B75、ASUS A68HM-E、MSI B150M 上来回试错之后，MSI Z170A Gaming M5 上的关键配置是：</p>
+          <ul>
+            <li><code>Advanced → Windows OS Configuration → Windows 10 WHQL Support = Disabled</code></li>
+            <li><strong>开启 Above 4G Decoding</strong>（M40 需要 64 位 BAR）</li>
+            <li><strong>关闭 CSM</strong>（纯 UEFI 模式，PCIe 资源分配才正确）</li>
+            <li>把 M40 插在 <strong>PCI_E1</strong>（直连 CPU 的顶部 x16 插槽）</li>
+          </ul>
+          <p>结果：<code>nvidia-smi</code> 显示完整 11,520 MiB（ECC 预留 512 MiB），烧机测试达到 <strong>100% 利用率 / FP32 6.12 TFLOPS（约峰值的 90%）</strong>，温度稳定在 35–39°C。</p>
+          <p><strong>意义：</strong>大约 <strong>1000–1200 元</strong>就能给家庭实验室增加 <strong>12 GB CUDA 显存</strong>——足以运行 Q4–Q8 量化的 7B–14B 模型、激进量化（IQ1_M 约 6.3 GB）的 27B 模型、批处理推理与 LoRA 微调。约 100 元每 GB。M40 需要以 <code>-DCMAKE_CUDA_ARCHITECTURES=52</code> 编译 llama.cpp；P100 需要 <code>=60</code>。</p>
+        </div>
+
+        <div class="blk">
+          <h3>GPU 拆解——从坏显卡上学硬件</h3>
+          <p>从二手市场买来坏掉的 <strong>Quadro 401 / 2000 / 4000</strong> 显卡，拆开研究电路板：VRM 电路（MOSFET、电感、电容）、显存颗粒布局，以及每一代架构（Fermi → ……）的差异。每块 PCB 都是一份工程决策的蓝图。</p>
+        </div>
+
+        <div class="blk">
+          <h3>云租用——当租云比自建更划算</h3>
+          <ul>
+            <li><strong>RunPod H200</strong>（141 GB HBM3e）约 $3.44/小时——SEC-EDGAR-GPT 实验与 1.5B 规模配置</li>
+            <li><strong>AMD Developer Cloud MI300X</strong>（192 GB HBM3）——从零训练 GPT-2 760M，探索 nanochat 与 DeepSeek v4 MoE</li>
+            <li><strong>DigitalOcean H100</strong>——配合 <code>zz</code> 工具箱的更多 GPT-2 训练</li>
+          </ul>
+          <p>成员身份：NVIDIA 加速计算开发者技术交流（Accelerated Computing Developer Tech Exchange），以及 <strong>AMD AI DevMaster 黑客松完赛奖</strong>（FluxReel，2026-07）。</p>
+        </div>
+
+        <!-- 04 用量与成本 -->
+        <div class="sec-head" style="margin-top: 84px;">
+          <p class="sec-kicker">04 / 用量与成本</p>
+          <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">重度 LLM 用户一年到底消耗了什么</h2>
+        </div>
+
+        <div class="table-wrap">
+          <table class="lab">
+            <thead><tr><th>平台</th><th>Token 数</th><th>周期</th><th>费用</th></tr></thead>
+            <tbody>
+              <tr><td>OpenRouter</td><td>7.28B</td><td>过去一年（15.5 万次请求）</td><td>$239</td></tr>
+              <tr><td>DeepSeek</td><td>629M</td><td>过去一年</td><td>—</td></tr>
+              <tr><td>SSSAICode（Claude）</td><td>1.15 亿+</td><td>2026 年 4 月（2,555 次请求，90.9% 缓存命中）</td><td>$171.53</td></tr>
+              <tr><td>小米 MIMO</td><td>1.25B</td><td>2026 年 5–6 月（mimo-v2.5-pro，约 96.7% 缓存命中）</td><td>免费 46 亿额度</td></tr>
+              <tr><td>GitHub Copilot 等</td><td>726M</td><td>过去一年</td><td>—</td></tr>
+              <tr><td><strong>合计</strong></td><td><strong>100 亿</strong></td><td>过去一年</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="blk">
+          <h3>这些数字教会我的事</h3>
+          <ul>
+            <li>缓存命中率是最大的成本杠杆——90%+ 的命中率能大幅压缩 API 账单。</li>
+            <li>一个主力生产模型（mimo-v2.5-pro）承担了约 96% 的用量——专注一条工作流，而不是十个玩具。</li>
+            <li>$3.44/小时的 H200 决定你如何排期实验；52 GB 自有显存决定其余的一切。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 服务 SERVICES ============ -->
+    <section class="section" data-anchor="services">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-kicker">服务</p>
+          <h2 class="sec-title">这个实验室能为你做什么</h2>
+          <p class="sec-sub">一个人的实验室把承诺说小、把证据做足。四条服务线，每一条的背后都是已经公开、可以验证的工作。</p>
+        </div>
+        <div class="pillar-grid">
+          <div class="pillar">
+            <div class="scheme">▰</div>
+            <h3>AI 推理</h3>
+            <p>为你的负载部署并调优开源模型服务——在你自己的 GPU 上，或选最合适的云。</p>
+            <ul>
+              <li>基于 vLLM / SGLang / llama.cpp 的部署，兼容 OpenAI API</li>
+              <li>量化方案：GGUF、GPTQ、AWQ、FP8——以及你会失去什么</li>
+              <li>附带真实数字的延迟/吞吐基准测试</li>
+              <li>KV 缓存容量、批处理与投机解码的合理性检查</li>
+            </ul>
+          </div>
+          <div class="pillar">
+            <div class="scheme">▰</div>
+            <h3>GPU 与硬件</h3>
+            <p>便宜且可靠的 GPU 算力——从回收二手数据中心显卡，到选择与运维云实例。</p>
+            <ul>
+              <li>高性价比工作站搭建（约 100 元/GB 的方法论）</li>
+              <li>GPU BIOS/UEFI 点亮、被动散热整机、温度验证</li>
+              <li>云厂商基准对比：RunPod、DigitalOcean、AMD Dev Cloud、各类 neocloud</li>
+              <li>功耗与成本建模，包括家庭阶梯电价的现实</li>
+            </ul>
+          </div>
+          <div class="pillar">
+            <div class="scheme">▰</div>
+            <h3>训练与微调</h3>
+            <p>针对你真实拥有的硬件，设计预训练、监督微调与数据管线。</p>
+            <ul>
+              <li>从零预训练小模型（GPT-2 级别，124M–760M+）</li>
+              <li>用 trl + peft 对开源模型做 LoRA / SFT</li>
+              <li>数据工程：FineWeb 风格分片管线、token 预算、去重</li>
+              <li>训练基建：可断点续传、日志与诚实的评估</li>
+            </ul>
+          </div>
+          <div class="pillar">
+            <div class="scheme">▰</div>
+            <h3>AI 咨询</h3>
+            <p>在真实工程组织中落地 AI——智能体、工作流与 LLM 集成，不贩卖焦虑。</p>
+            <ul>
+              <li>企业级 AI 智能体项目（在 HSBC：20 个智能体、400 个脚本、1,800 篇文档）</li>
+              <li>AI 辅助工程实践：评审、自动化、采纳度量</li>
+              <li>成本务实：token、GPU 与智能体的真实开销</li>
+              <li>技术演讲与工作坊（银行 80 人听众，从第一性原理讲起）</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sec-head" style="margin-top: 84px;">
+          <p class="sec-kicker">合作方式</p>
+          <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">小范围、讲证据、默认开源</h2>
+        </div>
+        <div class="blk">
+          <ul>
+            <li><strong>先做小范围实验</strong>——先在更小、可衡量的交付物（一个基准、一个托管 API、一个训练好的模型）上见效，再谈更大事。</li>
+            <li><strong>用证据代替 PPT</strong>——每个项目在可能的情况下都以公开成果收尾：代码、日志、数字。</li>
+            <li><strong>硬件按需选择</strong>——什么时候该租 $3.44/小时的 H200、什么时候该买二手 M40，我会直说。</li>
+            <li><strong>按天计费或按固定范围</strong>——咨询按天，一次性实验按固定报价。</li>
+          </ul>
+        </div>
+        <div class="blk">
+          <ul>
+            <li><strong>可自查的背书：</strong>在英国环球银行编程助手使用量进入前 6%；AIPlayer 贡献奖；SEC-EDGAR-GPT（内部 200+ 浏览）；13 次预训练；45 次提交的 nanoGPT 分支；<a href="https://github.com/lzwjava" target="_blank" rel="noopener">github.com/lzwjava</a> 上近 10 个长期维护的开源项目。</li>
+          </ul>
+        </div>
+        <div style="margin-top: 36px;">
+          <a class="btn btn-primary" href="#contact">开始一次对话</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 关于 ABOUT ============ -->
+    <section class="section alt" data-anchor="about">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-kicker">关于</p>
+          <h2 class="sec-title">一个工程师、一摞 GPU，和一股非要弄清楚不可的倔劲</h2>
+          <p class="sec-sub">
+            <strong>李智维（Zhiwei Li）</strong>——从全栈工程师转型的 AI 研究者。12 年专业工程经验、两次创业、
+            一家环球银行、过去一年消耗 100 亿 token。实验室刻意保持极小：当只有一个责任人时，
+            真相才更容易被验证。
+          </p>
+        </div>
+
+        <p class="sec-kicker" style="margin-top: 30px;">成长路径</p>
+        <h3 class="blk" style="font-size: 22px; margin-top: 0;">从 NOIP 到 nanoGPT</h3>
+
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="yr">2008 – 2014</div>
+            <h3>第一行代码、第一场比赛、第一个 App</h3>
+            <p>2008 年开始编程。2011 年进入广东省信息学奥林匹克竞赛（NOIP）前 300 名，在线解决约 1,000 道算法题。在北京林业大学（数字媒体艺术专业，一年后退学，通过 13 门课程）期间，做了被数千学生下载使用的校园助手 App，并获 2014 年蓝桥杯一等奖。</p>
+          </div>
+          <div class="tl-item">
+            <div class="yr">2014 – 2016</div>
+            <h3>LeanCloud 与 SDK 时代</h3>
+            <p>在 LeanCloud 担任软件工程师——参与 Objective-C 与 Java SDK 开发，并独立开发旗舰 SDK 演示应用 LeanChat 的 iOS 与 Android 客户端，另参与若干前端项目。</p>
+          </div>
+          <div class="tl-item">
+            <div class="yr">2015 – 2016</div>
+            <h3>联合创立 CodeReview.cn</h3>
+            <p>与五位联合创始人一起做的专业代码评审、交流与工作坊平台——约 3,000 名用户，负责后端与一半前端（PHP + Vue）。</p>
+          </div>
+          <div class="tl-item">
+            <div class="yr">2016 – 2019</div>
+            <h3>创立 Square Root 科技</h3>
+            <p>三年半里做了两门生意。<strong>Fun Live</strong>，知识直播平台：80 场讲座、30,000 用户、数百万页面浏览、约 2,000 次我自己写的代码提交。随后是软件咨询业务：50 个项目、约 300 万元营收、约 70 万元利润，以及江苏卫视《最强大脑》的微信小程序。</p>
+          </div>
+          <div class="tl-item">
+            <div class="yr">2019 – 2021</div>
+            <h3>全栈自由职业</h3>
+            <p>交付客户项目（ShowMeBug × 企业微信、贸易数据爬虫、LED 标牌公司官网）、又刷了约 500 道算法题，并系统入门机器学习与云原生技术。</p>
+          </div>
+          <div class="tl-item">
+            <div class="yr">2021 – 2023</div>
+            <h3>外派：DBS 与 HSBC 的银行后端</h3>
+            <p>为 DBS 做股票交易微服务（Avaloq、编辑距离搜索），随后参与 HSBC PayMe 的自动充值功能与 AWS 迁移。积累了 Java、Spring Cloud、银行系统与受监管环境工程方面的深厚经验。</p>
+          </div>
+          <div class="tl-item">
+            <div class="yr">2023</div>
+            <h3>转折点：组装第一台机器学习工作站</h3>
+            <p>组装 RTX 4070 工作站，完成 DeepLearning.AI 机器学习与深度学习专项课程，复现并拆解约 30 个机器学习示例项目，开始认真微调与预训练小模型。</p>
+          </div>
+          <div class="tl-item">
+            <div class="yr">2025 – 2026</div>
+            <h3>英国环球银行的 AI 工程实践</h3>
+            <p>通过 TEKsystems 派驻 HSBC 做全栈：20 个定制 AI 智能体、400 个可复用的助手编写脚本、1,800 篇生成文档、约 70 个自动生成测试用例、企业编程助手使用量进入前 6%，凭 AIPlayer 项目获得贡献奖，并给 80 人做了题为《从神经网络到智能体》的技术演讲。</p>
+          </div>
+          <div class="tl-item">
+            <div class="yr">2026</div>
+            <h3>Truth Labs</h3>
+            <p>训练 SEC-EDGAR-GPT、搭建 52 GB 二手 GPU 集群、钻研 MoE 与推理系统、消耗 100 亿 token 来学习这一切，并在加州科学与技术大学（CSTU）开始线上 MSCSE。所有内容——包括失败——都记录在 lzwjava.com。</p>
+          </div>
+        </div>
+
+        <div class="sec-head" style="margin-top: 60px;">
+          <p class="sec-kicker">个人档案</p>
+          <h2 class="sec-title" style="font-size: clamp(24px, 3vw, 32px);">快速了解</h2>
+        </div>
+        <div class="spec-list">
+          <div class="item"><div class="k">所在地</div><div class="v">中国广州</div></div>
+          <div class="item"><div class="k">语言</div><div class="v">中文（母语）、英语（雅思 6.5）</div></div>
+          <div class="item"><div class="k">经验</div><div class="v">共 12 年——2 年移动端、6 年全栈、2 年机器学习/大数据、2 年项目管理</div></div>
+          <div class="item"><div class="k">AI 资历</div><div class="v">从零训练 13 个小 LLM；机器学习 + 深度学习专项证书（DeepLearning.AI）；AMD AI DevMaster 完赛奖</div></div>
+          <div class="item"><div class="k">写作</div><div class="v">约 400 篇原创博客文章，约 7.5 万月浏览量，读过 320+ 本书</div></div>
+          <div class="item"><div class="k">进修</div><div class="v">加州科学与技术大学 MSCSE 线上硕士（计算机系统与工程，2026.10 – 至今）</div></div>
+        </div>
+
+        <div class="blk">
+          <h3>论文</h3>
+          <ul>
+            <li>李智维（2026 年 6 月）《SEC-EDGAR-GPT：从零在 SEC EDGAR 财报上训练的 GPT-2（124M）语言模型》——<a href="https://github.com/lzwjava/sec-edgar-gpt/raw/main/sec-edgar-gpt.pdf" target="_blank" rel="noopener">PDF</a> · <a href="https://github.com/lzwjava/sec-edgar-gpt" target="_blank" rel="noopener">代码</a></li>
+            <li>李智维（2025 年 8 月）《自然视力恢复：实验验证、散光改善与“刚好模糊”原则》——三年自我实验，把同一种研究肌肉用在生物学上。</li>
+          </ul>
+        </div>
+
+        <div class="blk">
+          <h3>为什么是一个人的“实验室”？</h3>
+          <p>大型实验室有预算去“买到”确定性。一个人的实验室必须亲手<em>建造</em>确定性——从二手显卡、公开数据集、以及反复训练直到结果无可辩驳。代价是真实的：没有研究团队、没有融资、没有新闻稿。换来的是一份完整的记录——<a href="https://lzwjava.com/ai-portfolio-en" target="_blank" rel="noopener">哪些实验成功了、哪些只是冒烟测试、哪些被放弃</a>——以及一种很实用的能力：亲手完成一个实验室的大部分工作。</p>
+        </div>
+
+        <div class="hero-actions" style="margin-top: 36px;">
+          <a class="btn btn-primary" href="#contact">联系我</a>
+          <a class="btn btn-ghost" href="https://lzwjava.com/resume-en" target="_blank" rel="noopener">完整简历</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 联系 CONTACT ============ -->
+    <section class="section" data-anchor="contact">
+      <div class="container">
+        <div class="sec-head">
+          <p class="sec-kicker">联系</p>
+          <h2 class="sec-title">一起造点东西，或者一起把它弄坏</h2>
+          <p class="sec-sub">雇佣一个人的实验室需要一点信任——所以请尽管要证据。我会乐意分享训练日志、基准数据或本站背后的任何公开工作。</p>
+        </div>
+
+        <ul class="contact-list">
+          <li><span class="k">邮箱</span><a href="mailto:lzwjava@gmail.com">lzwjava@gmail.com</a></li>
+          <li><span class="k">GitHub</span><a href="https://github.com/lzwjava" target="_blank" rel="noopener">github.com/lzwjava</a></li>
+          <li><span class="k">博客</span><a href="https://lzwjava.com" target="_blank" rel="noopener">lzwjava.com</a></li>
+          <li><span class="k">作品集</span><a href="https://lzwjava.com/ai-portfolio-en" target="_blank" rel="noopener">日常 AI 工作的实证</a></li>
+          <li><span class="k">简历</span><a href="https://lzwjava.com/resume-en" target="_blank" rel="noopener">完整简历与 PDF</a></li>
+          <li><span class="k">LinkedIn</span><a href="https://www.linkedin.com/in/lzwjava" target="_blank" rel="noopener">in/lzwjava</a></li>
+        </ul>
+
+        <div class="blk">
+          <h3>给我发什么</h3>
+          <ul>
+            <li><strong>推理/部署</strong>——模型、预期流量、延迟预算、你已有的硬件。</li>
+            <li><strong>GPU 装机</strong>——预算、目标显存、所在国家/地区（会影响二手市场价格）、功耗限制。</li>
+            <li><strong>训练</strong>——数据集、目标模型大小、你能访问的硬件，以及截止日期（如果有）。</li>
+            <li><strong>咨询</strong>——你想自动化的流程，以及什么指标能让它变得可衡量地更好。</li>
+            <li><strong>真诚的问题</strong>——任何问题。不知道就是不知道，我会公开地学会它。</li>
+          </ul>
+        </div>
+
+        <div class="blk">
+          <h3>回复预期与档期</h3>
+          <p>Truth Labs 由一个人运营，TA 有全职工作，还有烧 GPU 的习惯。通常一两天内回复；我宁愿回你一段深思熟虑的话，也不愿回你一行套话。<strong>接受小型实验与咨询合作</strong>，不要求排他——交付物是代码、日志与数字的那种。</p>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /i18n-zh -->
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner" id="footer-en" lang="en">
+    <div>
+      <p class="footer-wordmark">⟡ Truth Labs</p>
+      <p class="footer-tagline">Training, inference, GPU experiments, and consulting — one person, run in the open.</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/lzwjava" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://lzwjava.com" target="_blank" rel="noopener">Blog</a>
+      <a href="https://lzwjava.com/ai-portfolio-en" target="_blank" rel="noopener">AI Portfolio</a>
+      <a href="mailto:lzwjava@gmail.com">Email</a>
+    </div>
+    <p class="footer-meta">© <span class="js-year">2026</span> Zhiwei Li · Truth &amp; freedom.</p>
+  </div>
+  <div class="container footer-inner" id="footer-zh" lang="zh-CN">
+    <div>
+      <p class="footer-wordmark">⟡ Truth Labs</p>
+      <p class="footer-tagline">训练、推理、GPU 实验与咨询——一个人，公开地做。</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/lzwjava" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://lzwjava.com" target="_blank" rel="noopener">博客</a>
+      <a href="https://lzwjava.com/ai-portfolio-en" target="_blank" rel="noopener">AI 作品集</a>
+      <a href="mailto:lzwjava@gmail.com">邮箱</a>
+    </div>
+    <p class="footer-meta">© <span class="js-year">2026</span> 李智维 · 真知与自由。</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var langBtns = document.querySelectorAll('.lang-btn');
+  var themeBtn = document.getElementById('theme-btn');
+  var metaDesc = document.querySelector('meta[name="description"]');
+  var themeColor = document.querySelector('meta[name="theme-color"]');
+  var titles = {
+    en: 'Truth Labs — A one-person AI research lab',
+    zh: 'Truth Labs — 一个人的 AI 研究实验室'
+  };
+  var descs = {
+    en: 'Training, inference, GPU experiments, and consulting — one person, run in the open. Truth through compute.',
+    zh: '训练、推理、GPU 实验与咨询——一个人，公开地做。用算力求真。'
+  };
+
+  function currentLang() { return root.dataset.lang === 'zh' ? 'zh' : 'en'; }
+
+  function setLang(lang) {
+    root.dataset.lang = lang;
+    root.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
+    langBtns.forEach(function (b) {
+      var on = b.getAttribute('data-lang') === lang;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if (metaDesc) metaDesc.setAttribute('content', descs[lang]);
+    document.title = titles[lang];
+    try { localStorage.setItem('tl-lang', lang); } catch (e) {}
+  }
+
+  function setTheme(theme) {
+    root.dataset.theme = theme;
+    themeBtn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+    if (themeColor) themeColor.setAttribute('content', theme === 'light' ? '#faf8f4' : '#0a0a0b');
+    try { localStorage.setItem('tl-theme', theme); } catch (e) {}
+  }
+
+  /* Scroll to anchor inside the ACTIVE language block */
+  function scrollToHash(hash) {
+    var id = hash.slice(1);
+    if (!id || id === 'top') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    var c = document.getElementById('i18n-' + currentLang());
+    var el = c ? c.querySelector('[data-anchor="' + id + '"]') : null;
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  langBtns.forEach(function (b) {
+    b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); });
+  });
+  themeBtn.addEventListener('click', function () {
+    setTheme(root.dataset.theme === 'light' ? 'dark' : 'light');
+  });
+
+  /* Intercept in-page anchors; sections carry data-anchor, not ids */
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var hash = a.getAttribute('href');
+      if (!hash || hash.length < 2) return;
+      if (hash === '#top') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+      if (document.querySelector(hash) === null) {
+        e.preventDefault();
+        scrollToHash(hash);
+      }
+    });
+  });
+
+  var storedLang = null, storedTheme = null;
+  try { storedLang = localStorage.getItem('tl-lang'); storedTheme = localStorage.getItem('tl-theme'); } catch (e) {}
+  setLang(storedLang || ((navigator.language || '').toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en'));
+  setTheme(storedTheme || (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+
+  if (window.location.hash) scrollToHash(window.location.hash);
+  document.querySelector('.js-year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
