@@ -197,15 +197,22 @@ table.lab tbody tr:hover td { background: rgba(255,255,255,.02); }
 }
 @media (max-width: 620px) {
   body { font-size: 15.5px; }
-  .header-inner { height: auto; flex-wrap: wrap; padding: 10px 0; row-gap: 8px; }
-  .site-nav { order: 3; width: 100%; justify-content: flex-end; flex-wrap: wrap; }
-  .site-nav a { padding: 6px 9px; font-size: 13px; }
+  .header-inner { height: auto; padding: 8px 0; }  /* no wrap: wordmark + nav + tools stay on one line */
+  .site-nav { order: 0; margin-left: auto; gap: 4px; }  /* inline on row 1 instead of full-width row 2 */
+  .site-nav a { padding: 5px 8px; font-size: 12.5px; }
   .site-nav a.nav-cta { margin-left: 4px; }
   .hero { padding: 70px 0 50px; }
   .exp-grid { grid-template-columns: 1fr; }
   .stat { padding: 24px 18px; }
   .stat .num { font-size: 30px; }
   .section { padding: 68px 0; }
+}
+/* Extra-tight phones (≤400px): compress further so the single-line header still fits */
+@media (max-width: 400px) {
+  .site-nav { gap: 2px; }
+  .site-nav a { padding: 4px 6px; font-size: 12px; }
+  .header-tools { gap: 4px; margin-left: 4px; }
+  .lang-btn { padding: 4px 7px; }
 }
 /* Theme: light */
 html[data-theme="light"] {
