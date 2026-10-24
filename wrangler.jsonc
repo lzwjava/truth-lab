@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "truth-lab",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-24",
+  // No workers.dev subdomain - the site is served from truthlab.cc via the
+  // existing zone route (*.truthlab.cc/* -> truth-lab).
+  "workers_dev": false,
+  // Serve the static site straight from the repo root.
+  "assets": {
+    "directory": "./",
+    "exclude": [
+      ".git",
+      ".github",
+      ".sass-cache",
+      ".jekyll-cache",
+      ".jekyll-metadata",
+      "_site",
+      "vendor",
+      "src",
+      "wrangler.jsonc",
+      "README.md",
+      "Gemfile.lock"
+    ]
+  }
+}

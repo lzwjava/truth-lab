@@ -47,52 +47,34 @@ jobs:
           }
           echo "Cloudflare credentials OK."
 
-      - name: Deploy to Cloudflare Pages
-        # npx --yes so CI never hits the interactive install prompt. Plain run
-        # steps instead of wrangler-action (it also prepends `npx wrangler`, a
-        # source of confusion). Create the Pages project on the first deploy;
-        # `|| true` makes it a no-op on later runs when it already exists.
-        run: |
-          npx --yes wrangler pages project create truth-lab --production-branch=main 2>/dev/null || true
-          npx --yes wrangler pages deploy ./ --project-name=truth-lab --branch=${{ github.head_ref || github.ref_name }}
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Deploy to Cloudflare Workers
+        # wrangler.jsonc: name truth-lab, assets ./ (static site at repo root).
+        # truthlab.cc is served by this Worker via the existing zone route
+        # (*.truthlab.cc/* -> truth-lab), so every push updates truthlab.cc.
+        run: npx --yes wrangler deploy
 
-      - name: Inspect truthlab.cc bindings (temp probe)
+      - name: Cleanup & purge (temp)
         run: |
           python3 - <<'EOF'
           import json, os, urllib.request, urllib.error
           acc = os.environ["CLOUDFLARE_ACCOUNT_ID"]
           tok = os.environ["CLOUDFLARE_API_TOKEN"]
-          def api(url):
-              req = urllib.request.Request(url, headers={"Authorization": f"Bearer {tok}"})
+          def req(method, path, body=None):
+              r = urllib.request.Request(f"https://api.cloudflare.com/client/v4/{path}", method=method, headers={"Authorization": f"Bearer {tok}", "Content-Type": "application/json"}, data=json.dumps(body).encode() if body else None)
               try:
-                  with urllib.request.urlopen(req, timeout=30) as r:
-                      return json.load(r)
+                  with urllib.request.urlopen(r, timeout=30) as resp:
+                      return resp.status, json.load(resp)
               except urllib.error.HTTPError as e:
-                  return {"success": False, "errors": [{"message": f"HTTP {e.code}: {e.read().decode()[:200]}"}]}
-          print("== Pages projects ==")
-          for p in api(f"https://api.cloudflare.com/client/v4/accounts/{acc}/pages/projects?per_page=50").get("result", []):
-              doms = api(f"https://api.cloudflare.com/client/v4/accounts/{acc}/pages/projects/{p['name']}/domains")["result"]
-              print(p["name"], "->", [d["name"] for d in doms])
-          print("== Zone truthlab.cc ==")
-          z = api("https://api.cloudflare.com/client/v4/zones?name=truthlab.cc")
-          for zone in z.get("result", []):
-              print(zone["id"], zone["name"], zone["status"])
-              wdoms = api(f"https://api.cloudflare.com/client/v4/accounts/{acc}/workers/domains")
-              for d in wdoms.get("result", []):
-                  print("worker domain:", d.get("hostname"), "->", d.get("worker"))
-              routes = api(f"https://api.cloudflare.com/client/v4/zones/{zone['id']}/workers/routes")
-              for r in routes.get("result", []):
-                  print("worker route:", r.get("pattern"), "->", r.get("script"))
-          print("== DNS truthlab.cc ==")
-          zid = (z.get("result") or [{}])[0].get("id")
+                  return e.code, json.loads(e.read().decode() or "{}")
+          st, p = req("GET", f"accounts/{acc}/pages/projects")
+          if p.get("errors"): print("list pages ERR:", p["errors"])
+          else: print("pages projects:", [x["name"] for x in p.get("result", [])])
+          st, d = req("DELETE", f"accounts/{acc}/pages/projects/truth-lab")
+          print("delete pages truth-lab:", st, d.get("errors") or "ok")
+          st, z = req("GET", "zones?name=truthlab.cc")
+          zid = z["result"][0]["id"] if z.get("result") else None
           if zid:
-              for r in api(f"https://api.cloudflare.com/client/v4/zones/{zid}/dns_records?per_page=50").get("result", []):
-                  print(r["type"], r["name"], r.get("content"), "proxied=" + str(r.get("proxied")))
-          print("probe done")
+              st, pc = req("POST", f"zones/{zid}/purge_cache", {"purge_everything": True})
+              print("purge cache:", st, pc.get("errors") or "ok")
+          print("cleanup done")
           EOF
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
