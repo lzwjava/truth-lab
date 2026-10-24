@@ -48,10 +48,13 @@ jobs:
           echo "Cloudflare credentials OK."
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # Static single-file site — no build step, upload the repo root as-is.
-          # Note: no leading "wrangler" — the action prepends `npx wrangler` itself.
-          command: pages deploy ./ --project-name=truth-lab --branch=${{ github.head_ref || github.ref_name }}
+        # npx --yes so CI never hits the interactive install prompt. Plain run
+        # steps instead of wrangler-action (it also prepends `npx wrangler`, a
+        # source of confusion). Create the Pages project on the first deploy;
+        # `|| true` makes it a no-op on later runs when it already exists.
+        run: |
+          npx --yes wrangler pages project create truth-lab --production-branch=main 2>/dev/null || true
+          npx --yes wrangler pages deploy ./ --project-name=truth-lab --branch=${{ github.head_ref || github.ref_name }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
