@@ -59,8 +59,40 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Attach custom domain truthlab.cc (temp probe)
-        run: npx --yes wrangler pages domain add truthlab.cc --project-name truth-lab
+      - name: Inspect truthlab.cc bindings (temp probe)
+        run: |
+          python3 - <<'EOF'
+          import json, os, urllib.request, urllib.error
+          acc = os.environ["CLOUDFLARE_ACCOUNT_ID"]
+          tok = os.environ["CLOUDFLARE_API_TOKEN"]
+          def api(url):
+              req = urllib.request.Request(url, headers={"Authorization": f"Bearer {tok}"})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      return json.load(r)
+              except urllib.error.HTTPError as e:
+                  return {"success": False, "errors": [{"message": f"HTTP {e.code}: {e.read().decode()[:200]}"}]}
+          print("== Pages projects ==")
+          for p in api(f"https://api.cloudflare.com/client/v4/accounts/{acc}/pages/projects?per_page=50").get("result", []):
+              doms = api(f"https://api.cloudflare.com/client/v4/accounts/{acc}/pages/projects/{p['name']}/domains")["result"]
+              print(p["name"], "->", [d["name"] for d in doms])
+          print("== Zone truthlab.cc ==")
+          z = api("https://api.cloudflare.com/client/v4/zones?name=truthlab.cc")
+          for zone in z.get("result", []):
+              print(zone["id"], zone["name"], zone["status"])
+              wdoms = api(f"https://api.cloudflare.com/client/v4/accounts/{acc}/workers/domains")
+              for d in wdoms.get("result", []):
+                  print("worker domain:", d.get("hostname"), "->", d.get("worker"))
+              routes = api(f"https://api.cloudflare.com/client/v4/zones/{zone['id']}/workers/routes")
+              for r in routes.get("result", []):
+                  print("worker route:", r.get("pattern"), "->", r.get("script"))
+          print("== DNS truthlab.cc ==")
+          zid = (z.get("result") or [{}])[0].get("id")
+          if zid:
+              for r in api(f"https://api.cloudflare.com/client/v4/zones/{zid}/dns_records?per_page=50").get("result", []):
+                  print(r["type"], r["name"], r.get("content"), "proxied=" + str(r.get("proxied")))
+          print("probe done")
+          EOF
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
