@@ -53,4 +53,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           # Static single-file site — no build step, upload the repo root as-is.
-          command: wrangler pages deploy ./ --project-name=truth-lab --branch=${{ github.head_ref || github.ref_name }}
+          # Note: no leading "wrangler" — the action prepends `npx wrangler` itself.
+          command: pages deploy ./ --project-name=truth-lab --branch=${{ github.head_ref || github.ref_name }}
