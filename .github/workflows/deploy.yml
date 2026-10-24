@@ -16,6 +16,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Secrets are stored in the "prod" GitHub environment, so the job
+    # must opt in to that environment to access them.
+    environment: prod
     permissions:
       contents: read
       deployments: write
