@@ -1,8 +1,8 @@
 name: Deploy to Cloudflare Pages
 
 on:
+  # Build on every push (any branch), not just main.
   push:
-    branches: [main]
   pull_request:
     branches: [main]
     types: [opened, synchronize, closed]
